@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Robô IQ Option</title>
+    <style>
+      :root {
+        --primary: #2196f3;
+        --success: #4caf50;
+        --danger: #f44336;
+        --warning: #ff9800;
+        --dark: #333;
+        --light: #f8f9fa;
+        --border-radius: 8px;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        margin: 0;
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 700px;
+        margin: 30px auto;
+        background: white;
+        padding: 25px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+      }
+
+      h2 {
+        text-align: center;
+        color: var(--dark);
+        margin-bottom: 25px;
+        border-bottom: 2px solid var(--primary);
+        padding-bottom: 10px;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: var(--dark);
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 12px;
+        margin: 5px 0 15px;
+        border-radius: var(--border-radius);
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+        transition: border 0.3s, box-shadow 0.3s;
+        font-size: 16px;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.25);
+        outline: none;
+      }
+
+      button {
+        width: 48%;
+        padding: 14px;
+        margin: 10px 0;
+        border-radius: var(--border-radius);
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.1s;
+        font-size: 16px;
+      }
+
+      #start {
+        background-color: var(--success);
+        color: white;
+        float: left;
+      }
+
+      #stop {
+        background-color: var(--danger);
+        color: white;
+        float: right;
+      }
+
+      button:hover {
+        opacity: 0.9;
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      .button-group {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+        clear: both;
+      }
+
+      .log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .log {
+        background: #1e1e1e;
+        color: #00e676;
+        padding: 15px;
+        height: 250px;
+        overflow-y: auto;
+        font-family: 'Consolas', monospace;
+        border-radius: var(--border-radius);
+        font-size: 14px;
+        line-height: 1.5;
+        margin-top: 15px;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+      }
+
+      .account-warning {
+        display: inline-block;
+        background-color: var(--warning);
+        color: white;
+        padding: 6px 10px;
+        border-radius: var(--border-radius);
+        margin-left: 10px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .section {
+        padding: 15px;
+        background: var(--light);
+        border-radius: var(--border-radius);
+        margin-bottom: 15px;
+      }
+
+      .section-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: var(--primary);
+      }
+
+      .pair-status {
+        display: flex;
+        align-items: center;
+        margin-top: 5px;
+        font-size: 12px;
+        color: #666;
+      }
+
+      .badge {
+        background-color: var(--primary);
+        color: white;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+      }
+
+      .refresh-btn {
+        background: none;
+        border: none;
+        color: var(--primary);
+        cursor: pointer;
+        padding: 2px 5px;
+        margin-left: 8px;
+        transition: transform 0.2s;
+      }
+
+      .refresh-btn:hover {
+        transform: rotate(30deg);
+      }
+
+      .loading .refresh-btn svg {
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .pair-category {
+        font-weight: bold;
+        background-color: #f0f0f0;
+        pointer-events: none;
+        font-size: 13px;
+      }
+
+      /* Responsive designs */
+      @media (max-width: 768px) {
+        .container {
+          max-width: 95%;
+          padding: 15px;
+        }
+
+        button {
+          width: 100%;
+          margin: 5px 0;
+        }
+
+        #start,
+        #stop {
+          float: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Robô IQ Option</h2>
+
+      <div class="section">
+        <div class="section-title">Configuração de Conta</div>
+        <div class="form-group">
+          <label for="tipo_conta">Tipo de Conta</label>
+          <select id="tipo_conta">
+            <option value="PRACTICE">Conta Demo</option>
+            <option value="REAL">Conta Real</option>
+          </select>
+          <div
+            id="account-warning"
+            class="account-warning"
+            style="display: none"
+          >
+            Usando Conta Real - Cuidado!
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Parâmetros de Operação</div>
+        <div class="form-group">
+          <label for="valor">Valor da entrada (R$)</label>
+          <input type="number" id="valor" value="2" />
+        </div>
+
+        <div class="form-group">
+          <label for="tempo">Tempo de expiração (minutos)</label>
+          <input type="number" id="tempo" value="5" />
+        </div>
+
+        <div class="form-group">
+          <label for="par">Par de moedas</label>
+          <select id="par">
+            <option value="TODOS">TODOS - Monitorar todos os pares</option>
+            <option value="EURUSD">EUR/USD</option>
+            <option value="USDJPY">USD/JPY</option>
+          </select>
+          <div class="pair-status">
+            <span id="pair-count" class="badge">0 pares disponíveis</span>
+            <button type="button" id="refresh-pairs" class="refresh-btn">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M8 3a5 5 0 1 0 0 10A5 5 0 0 0 8 3zm4.5 5.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0z"
+                />
+                <path
+                  d="M8.5 5.5a.5.5 0 0 0-1 0v2.5H6a.5.5 0 0 0 0 1h2a.5.5 0 0 0 .5-.5z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Configuração de Martingale</div>
+        <div class="form-group">
+          <label for="usar_mg">Habilitar Martingale</label>
+          <select id="usar_mg">
+            <option value="true">Sim</option>
+            <option value="false">Não</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="multiplicador">Multiplicador Martingale</label>
+          <input type="number" id="multiplicador" value="2" />
+        </div>
+
+        <div class="form-group">
+          <label for="max_mg">Máximo de Martingales</label>
+          <input type="number" id="max_mg" value="3" />
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button id="start" onclick="ligarRobo()">Ligar Robô</button>
+        <button id="stop" onclick="desligarRobo()">Desligar Robô</button>
+      </div>
+
+      <div
+        class="status-indicator"
+        id="connection-status"
+        style="
+          text-align: center;
+          margin: 10px 0;
+          font-weight: bold;
+          color: #888;
+        "
+      >
+        Estado da conexão: Desconectado
+      </div>
+
+      <div class="log-header">
+        <h3>Log de Operações:</h3>
+        <button
+          id="clear-log"
+          onclick="limparLog()"
+          style="width: auto; padding: 5px 10px; margin: 0; font-size: 12px"
+        >
+          Limpar Log
+        </button>
+      </div>
+      <div class="log" id="log"></div>
+    </div>
+
+    <script>
+      let roboLigado = false
+      let websocket = null
+      let reconnectAttempts = 0
+      const maxReconnectAttempts = 5
+      let pairCheckInterval = null // Intervalo para verificação de pares
+      let unavailablePairsSet = new Set() // Conjunto para armazenar pares indisponíveis
+
+      function logar(msg) {
+        const log = document.getElementById('log')
+        const timestamp = new Date().toLocaleTimeString()
+        log.innerHTML += `<span style="color:#888">[${timestamp}]</span> ${msg}<br>`
+        log.scrollTop = log.scrollHeight
+      }
+
+      function limparLog() {
+        document.getElementById('log').innerHTML = ''
+      }
+
+      function updateConnectionStatus(status, color) {
+        const statusEl = document.getElementById('connection-status')
+        statusEl.textContent = `Estado da conexão: ${status}`
+        statusEl.style.color = color
+      }
+
+      document
+        .getElementById('tipo_conta')
+        .addEventListener('change', function () {
+          const warning = document.getElementById('account-warning')
+          if (this.value === 'REAL') {
+            warning.style.display = 'inline-block'
+          } else {
+            warning.style.display = 'none'
+          }
+        })
+
+      async function loadPairsFromFile() {
+        try {
+          const response = await fetch('available_pairs.json')
+          if (response.ok) {
+            const data = await response.json()
+            logar(
+              `Carregados ${data.pairs.length} pares do arquivo (atualizado em ${data.datetime})`
+            )
+            updatePairsList(data.pairs)
+            return true
+          }
+        } catch (e) {
+          console.error('Erro ao carregar pares do arquivo:', e)
+        }
+        return false
+      }
+
+      function updatePairsList(pairs) {
+        const parSelect = document.getElementById('par')
+        const currentValue = parSelect.value
+
+        // Sempre mantém a opção TODOS
+        parSelect.innerHTML =
+          '<option value="TODOS">TODOS - Monitorar todos os pares</option>'
+
+        if (pairs && pairs.length) {
+          // Agrupa os pares por categorias
+          const fxPairs = pairs.filter(
+            p =>
+              !p.includes('OTC') &&
+              (p.includes('USD') ||
+                p.includes('EUR') ||
+                p.includes('GBP') ||
+                p.includes('JPY'))
+          )
+          const otcPairs = pairs.filter(p => p.includes('OTC'))
+          const cryptoPairs = pairs.filter(
+            p => p.includes('CRYPTO') || p.includes('BTC') || p.includes('ETH')
+          )
+          const stockPairs = pairs.filter(
+            p =>
+              !fxPairs.includes(p) &&
+              !otcPairs.includes(p) &&
+              !cryptoPairs.includes(p)
+          )
+
+          // Adiciona categorias com pares
+          if (fxPairs.length) {
+            parSelect.innerHTML +=
+              '<option class="pair-category" disabled>--- FOREX ---</option>'
+            fxPairs.forEach(pair => {
+              parSelect.innerHTML += `<option value="${pair}">${pair}</option>`
+            })
+          }
+
+          if (otcPairs.length) {
+            parSelect.innerHTML +=
+              '<option class="pair-category" disabled>--- OTC ---</option>'
+            otcPairs.forEach(pair => {
+              parSelect.innerHTML += `<option value="${pair}">${pair}</option>`
+            })
+          }
+
+          if (cryptoPairs.length) {
+            parSelect.innerHTML +=
+              '<option class="pair-category" disabled>--- CRYPTO ---</option>'
+            cryptoPairs.forEach(pair => {
+              parSelect.innerHTML += `<option value="${pair}">${pair}</option>`
+            })
+          }
+
+          if (stockPairs.length) {
+            parSelect.innerHTML +=
+              '<option class="pair-category" disabled>--- OUTROS ---</option>'
+            stockPairs.forEach(pair => {
+              parSelect.innerHTML += `<option value="${pair}">${pair}</option>`
+            })
+          }
+
+          document.getElementById(
+            'pair-count'
+          ).textContent = `${pairs.length} pares disponíveis`
+        } else {
+          document.getElementById('pair-count').textContent =
+            '0 pares disponíveis'
+          logar('⚠️ Nenhum par de moeda disponível recebido do servidor')
+        }
+
+        try {
+          parSelect.value = currentValue
+        } catch (e) {
+          parSelect.value = 'TODOS'
+        }
+      }
+
+      function requestAvailablePairs() {
+        if (websocket && websocket.readyState === 1) {
+          document
+            .getElementById('refresh-pairs')
+            .parentNode.classList.add('loading')
+
+          websocket.send(
+            JSON.stringify({
+              command: 'get_available_pairs'
+            })
+          )
+
+          logar('🔄 Solicitando pares disponíveis...')
+        } else {
+          logar('⚠️ Não é possível atualizar pares: servidor desconectado')
+          document
+            .getElementById('refresh-pairs')
+            .parentNode.classList.remove('loading')
+
+          // Tenta carregar do arquivo quando offline
+          loadPairsFromFile()
+        }
+      }
+
+      function connectWebSocket() {
+        if (!websocket || websocket.readyState === 3) {
+          try {
+            updateConnectionStatus('Conectando...', '#ff9800')
+            websocket = new WebSocket('ws://localhost:6789')
+
+            websocket.onopen = function () {
+              logar('✅ Conectado ao servidor com sucesso!')
+              updateConnectionStatus('Conectado', '#4CAF50')
+              reconnectAttempts = 0
+
+              // Solicita pares imediatamente após conectar
+              setTimeout(() => requestAvailablePairs(), 500)
+
+              if (roboLigado) {
+                enviarConfiguracao()
+              }
+            }
+
+            websocket.onmessage = function (event) {
+              try {
+                const data = JSON.parse(event.data)
+
+                if (data.status === 'pairs_list' && data.pairs) {
+                  if (data.pairs.length > 0) {
+                    updatePairsList(data.pairs)
+                    document
+                      .getElementById('refresh-pairs')
+                      .parentNode.classList.remove('loading')
+                    logar(
+                      `✅ Lista de pares atualizada: ${data.pairs.length} pares disponíveis`
+                    )
+                  } else {
+                    document
+                      .getElementById('refresh-pairs')
+                      .parentNode.classList.remove('loading')
+                    logar('⚠️ Servidor retornou 0 pares disponíveis')
+                    // Tenta carregar de backup
+                    loadPairsFromFile()
+                  }
+                } else if (data.status === 'error') {
+                  document
+                    .getElementById('refresh-pairs')
+                    .parentNode.classList.remove('loading')
+                  logar(`❌ Erro do servidor: ${data.msg}`)
+                } else {
+                  logar(data.msg)
+                }
+              } catch (e) {
+                logar(`❌ Erro ao processar resposta: ${e.message}`)
+                console.error('Erro ao processar mensagem:', e, event.data)
+              }
+            }
+
+            websocket.onerror = function (error) {
+              logar('❌ Erro na conexão com o servidor')
+              console.error('WebSocket Error: ', error)
+            }
+
+            websocket.onclose = function (event) {
+              updateConnectionStatus('Desconectado', '#f44336')
+              logar('Conexão fechada. Tentando reconectar...')
+
+              if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++
+                setTimeout(connectWebSocket, 3000)
+              } else {
+                logar(
+                  '❌ Falha ao conectar após várias tentativas. Verifique se o servidor está rodando.'
+                )
+                updateConnectionStatus('Falha na conexão', '#f44336')
+              }
+            }
+          } catch (err) {
+            logar(`❌ Erro ao criar conexão WebSocket: ${err.message}`)
+            console.error(err)
+          }
+        }
+      }
+
+      function ligarRobo() {
+        roboLigado = true
+        logar('🤖 Ligando robô...')
+
+        // Verifica se o par selecionado está disponível
+        const selectedPair = document.getElementById('par').value
+        if (selectedPair !== 'TODOS' && unavailablePairsSet.has(selectedPair)) {
+          logar(
+            `⚠️ AVISO: O par ${selectedPair} não está disponível para negociação!`
+          )
+          logar(
+            'Escolha outro par ou use a opção "TODOS" para operação automática.'
+          )
+          flashElement(document.getElementById('par'))
+          return
+        }
+
+        if (!websocket || websocket.readyState !== 1) {
+          connectWebSocket()
+        } else {
+          enviarConfiguracao()
+        }
+      }
+
+      function enviarConfiguracao() {
+        if (websocket && websocket.readyState === 1) {
+          const config = {
+            ligado: roboLigado,
+            valor: parseFloat(document.getElementById('valor').value),
+            multiplicador: parseFloat(
+              document.getElementById('multiplicador').value
+            ),
+            max_mg: parseInt(document.getElementById('max_mg').value),
+            tempo: parseInt(document.getElementById('tempo').value),
+            par: document.getElementById('par').value,
+            martingale: document.getElementById('usar_mg').value === 'true',
+            tipo_conta: document.getElementById('tipo_conta').value
+          }
+
+          websocket.send(JSON.stringify(config))
+          logar(`📤 Configuração enviada ao servidor`)
+        } else {
+          logar(
+            '❌ Não foi possível enviar a configuração. Servidor desconectado.'
+          )
+        }
+      }
+
+      function desligarRobo() {
+        roboLigado = false
+        logar('⏹️ Robô desligado.')
+
+        if (websocket && websocket.readyState === 1) {
+          websocket.send(JSON.stringify({ ligado: false }))
+        }
+
+        // Limpa o intervalo de verificação quando o robô for desligado
+        if (pairCheckInterval) {
+          clearInterval(pairCheckInterval)
+          pairCheckInterval = null
+        }
+      }
+
+      window.addEventListener('load', function () {
+        logar('Bem-vindo ao Robô Trader IQ Option')
+        logar('Para começar, clique em "Ligar Robô"')
+        setTimeout(connectWebSocket, 1000)
+
+        setTimeout(() => {
+          if (websocket && websocket.readyState === 1) {
+            requestAvailablePairs()
+          }
+        }, 2000)
+
+        // Tenta carregar pares do arquivo disponível
+        loadPairsFromFile().then(loaded => {
+          if (!loaded) {
+            // Se não conseguir carregar do arquivo, aguarda conexão com o servidor
+            logar(
+              'Aguardando conexão com o servidor para carregar pares disponíveis...'
+            )
+          }
+        })
+      })
+
+      // Adiciona evento para verificar disponibilidade ao mudar o par
+      document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('par').addEventListener('change', function () {
+          const selectedPair = this.value
+          if (
+            selectedPair !== 'TODOS' &&
+            websocket &&
+            websocket.readyState === 1
+          ) {
+            // Verifica imediatamente o novo par selecionado
+            websocket.send(
+              JSON.stringify({
+                command: 'check_pair_availability',
+                pair: selectedPair
+              })
+            )
+          }
+        })
+      })
+    </script>
+  </body>
+</html>

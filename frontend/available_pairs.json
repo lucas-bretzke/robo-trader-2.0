@@ -1,0 +1,22 @@
+{
+  "timestamp": 1701123456,
+  "datetime": "2023-11-27 12:34:56",
+  "pairs": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "AUDUSD",
+    "USDCHF",
+    "NZDUSD",
+    "USDCAD",
+    "EURJPY",
+    "GBPJPY",
+    "AUDJPY",
+    "EURUSD-OTC",
+    "EURGBP-OTC",
+    "USDCHF-OTC",
+    "EURJPY-OTC",
+    "BTCUSD",
+    "ETHUSD"
+  ]
+}

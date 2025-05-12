@@ -9,7 +9,10 @@ import random
 from debug_tools import setup_logging, log_api_response
 import argparse
 import traceback
+import logging  # Adicionando import de logging que estava faltando
 from pair_monitor import PairMonitor
+import ssl
+from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 
 # Verificando se o pacote iqoptionapi está instalado
 try:
@@ -44,6 +47,13 @@ config = {
     "tipo_conta": "PRACTICE"  # Padrão para conta demo
 }
 
+# Lista de pares mais confiáveis e comuns (atualizar conforme necessário)
+PARES_CONFIÁVEIS = [
+    "EURUSD", "EURGBP", "GBPUSD", "USDCHF", "EURCHF", "AUDUSD", 
+    "NZDUSD", "USDJPY", "EURJPY", "GBPJPY", "AUDJPY", "USDJPY", 
+    "EURAUD", "EURCAD", "USDCAD"
+]
+
 # Setup de argumentos de linha de comando
 parser = argparse.ArgumentParser(description='IQ Option Trading Bot')
 parser.add_argument('--debug', action='store_true', help='Enable debug mode')
@@ -56,6 +66,19 @@ logger = setup_logging()
 iq = None
 connected_clients = set()
 pair_monitor = None
+
+def ensure_log_directory():
+    """Garante que o diretório de logs existe"""
+    # Usa o diretório atual do script como base
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    log_dir = os.path.join(base_dir, "logs")
+    
+    # Cria o diretório se não existir
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+        print(f"[i] Diretório de logs criado: {log_dir}")
+    
+    return log_dir
 
 async def get_available_pairs():
     """Retorna os pares de moedas disponíveis para o cliente"""
@@ -71,46 +94,78 @@ async def get_available_pairs():
         logger.error(f"Erro ao obter pares disponíveis: {str(e)}")
         return ["EURUSD", "USDJPY"]  # Fallback em caso de erro
 
-async def check_pair_availability(pair):
+async def verificar_par_disponivel(par, iq):
     """Verifica se um par específico está disponível para negociação"""
-    global iq
+    # Caso especial para a opção "TODOS"
+    if par.upper() == "TODOS":
+        # Para "TODOS", retorne True, pois não é um par específico, 
+        # mas uma instrução para monitorar todos os pares
+        return True
     
-    if not iq:
+    # Verificar se iq está inicializado
+    if iq is None:
+        print("❌ IQ não inicializado ao verificar disponibilidade do par")
         return False
     
     try:
-        all_pairs = iq.api.get_all_open_time()
-        if not all_pairs or "binary" not in all_pairs:
-            logger.warning(f"Erro ao verificar disponibilidade do par {pair}")
-            return False
-            
-        if pair in all_pairs["binary"]:
-            is_available = all_pairs["binary"][pair]["open"]
-            logger.info(f"Par {pair}: {'disponível' if is_available else 'indisponível'}")
-            return is_available
-        else:
-            logger.warning(f"Par {pair} não encontrado na lista de pares")
-            return False
-            
+        # Comportamento existente para verificação de pares reais
+        all_open_time = iq.api.get_all_open_time()  # Corrigindo acesso à API
+        
+        # Verifica se o par existe e está disponível
+        for market in ["binary", "turbo", "digital"]:
+            if market in all_open_time:
+                if par in all_open_time[market]:
+                    if all_open_time[market][par]["open"]:
+                        return True
+        
+        # Se chegou aqui, o par não está disponível
+        return False
     except Exception as e:
-        logger.error(f"Erro ao verificar disponibilidade do par {pair}: {str(e)}")
+        print(f"❌ Erro ao verificar disponibilidade do par {par}: {str(e)}")
         return False
 
 async def analisar_tendencia(par):
     """Análise de tendência com suporte para 'TODOS'"""
-    global pair_monitor
+    global pair_monitor, iq
     
-    if par == "TODOS" and pair_monitor:
-        # Se estiver no modo "TODOS", escolhe um par disponível
-        best_pair = pair_monitor.get_best_pair()
-        if best_pair:
-            await notify_clients(f"Selecionado par {best_pair} para operação")
-            par = best_pair
+    par_operacao = par  # Criar uma variável para armazenar o par que será efetivamente usado
+    
+    if par.upper() == "TODOS":
+        # Primeiro, tentar obter um par confiável que esteja disponível
+        try:
+            if iq is not None:
+                all_pairs = iq.api.get_all_open_time()
+                if "binary" in all_pairs:
+                    # Primeiro tenta usar pares confiáveis
+                    for safe_pair in PARES_CONFIÁVEIS:
+                        if safe_pair in all_pairs["binary"] and all_pairs["binary"][safe_pair]["open"]:
+                            par_operacao = safe_pair
+                            await notify_clients(f"Selecionado par confiável {safe_pair} para operação")
+                            print(f"[✅] Usando par confiável {safe_pair}")
+                            break
+                    
+                    # Se não encontrou nenhum par confiável, vai para plano B
+                    if par_operacao == "TODOS" and pair_monitor and hasattr(pair_monitor, 'get_best_pair'):
+                        best_pair = pair_monitor.get_best_pair()
+                        if best_pair:
+                            # Verifica se o par realmente é suportado pelo sistema antes de usar
+                            if iq.verificar_par_suportado(best_pair):
+                                await notify_clients(f"Selecionado par {best_pair} para operação")
+                                par_operacao = best_pair
+                                print(f"[✅] Usando par recomendado pelo monitor: {best_pair}")
+                            else:
+                                print(f"[⚠️] Par {best_pair} não é suportado, buscando alternativa")
+        except Exception as e:
+            logger.error(f"Erro ao buscar par alternativo no modo TODOS: {e}")
+            # Se ocorrer erro ao selecionar par automaticamente, use EURUSD (geralmente disponível)
+            par_operacao = "EURUSD"
+            await notify_clients(f"Erro ao selecionar par, usando EURUSD como padrão")
+            print(f"[⚠️] Usando EURUSD como último recurso: {e}")
     
     # Simulação simples: aleatório para exemplo
     direcao = random.choice(["call", "put"])
-    print(f"[📈] Tendência detectada: {direcao.upper()}")
-    return direcao
+    print(f"[📈] Tendência detectada: {direcao.upper()} para {par_operacao}")
+    return direcao, par_operacao  # Retornar tanto a direção quanto o par usado
 
 async def executar_robô():
     global config, iq
@@ -125,22 +180,37 @@ async def executar_robô():
                 
                 par = config["par"]
                 
-                # Verificar se o par está disponível para operação
-                if not par in pares_abertos["binary"] or not pares_abertos["binary"][par]["open"]:
-                    await notify_clients(f"⚠️ O par {par} não está disponível para negociação agora")
-                    await asyncio.sleep(30)  # Espera antes de tentar novamente
-                    continue
+                # Tratamento especial para o modo "TODOS"
+                if par.upper() == "TODOS":
+                    # Para o modo "TODOS", vamos selecionar um par disponível através do pair_monitor
+                    direcao_tendencia, par_escolhido = await analisar_tendencia(par)
                     
-                direcao_tendencia = await analisar_tendencia(config["par"])
+                    if par_escolhido == "TODOS":
+                        # Se analisar_tendencia também retornou TODOS, não temos pares disponíveis
+                        await notify_clients("⚠️ Modo TODOS ativado mas nenhum par disponível encontrado")
+                        await asyncio.sleep(30)  # Espera antes de tentar novamente
+                        continue
+                    
+                    # Usar o par escolhido pelo analisador
+                    par_atual = par_escolhido
+                else:
+                    # Para um par específico, verificar disponibilidade
+                    if not await verificar_par_disponivel(par, iq):
+                        await notify_clients(f"⚠️ O par {par} não está disponível para negociação agora")
+                        await asyncio.sleep(30)  # Espera antes de tentar novamente
+                        continue
+                    
+                    direcao_tendencia, _ = await analisar_tendencia(par)
+                    par_atual = par
                 
                 # Na versão de exemplo, usamos a tendência como direção de operação
                 direcao_operar = direcao_tendencia
                 
-                logger.info(f"Executando operação: {direcao_operar} em {config['par']}")
-                await notify_clients(f"Operando: {direcao_operar.upper()} em {config['par']}")
+                logger.info(f"Executando operação: {direcao_operar} em {par_atual}")
+                await notify_clients(f"Operando: {direcao_operar.upper()} em {par_atual}")
                 
-                # Configure antes de cada operação
-                iq.definir_config(config["par"], config["tempo"], config["valor"], config["tipo_conta"])
+                # Configure antes de cada operação (usar o par correto)
+                iq.definir_config(par_atual, config["tempo"], config["valor"], config["tipo_conta"])
                 
                 # Tentativa de operação com tratamento de exceção
                 try:
@@ -177,42 +247,88 @@ async def notify_clients(message):
         data = json.dumps({"status": "info", "msg": message})
         await asyncio.gather(*[client.send(data) for client in connected_clients])
 
+async def websocket_heartbeat(websocket):
+    """Envia heartbeats periódicos para manter a conexão ativa"""
+    try:
+        counter = 0
+        while True:
+            # A cada 30 segundos, enviar um heartbeat completo
+            await websocket.send(json.dumps({
+                "status": "heartbeat",
+                "counter": counter,
+                "timestamp": time.time()
+            }))
+            counter += 1
+            
+            # Fazer sleep em intervalos menores para responder mais rapidamente
+            # se a tarefa for cancelada
+            for _ in range(30):
+                await asyncio.sleep(1)
+    except (ConnectionClosedError, ConnectionClosedOK, asyncio.CancelledError):
+        # Conexão fechada normalmente, não precisa logar
+        pass
+    except Exception as e:
+        logger.error(f"Erro no heartbeat: {e}")
+
 async def handler(websocket):
     global config, iq, connected_clients, pair_monitor
     
     # Adiciona o cliente à lista de conexões
+    client_id = id(websocket)  # ID único para este cliente
     connected_clients.add(websocket)
-    print(f"[+] Cliente conectado. Total de clientes: {len(connected_clients)}")
+    print(f"[+] Cliente conectado (ID: {client_id}). Total de clientes: {len(connected_clients)}")
+    
+    # Iniciar tarefa de heartbeat para manter a conexão
+    heartbeat_task = asyncio.create_task(websocket_heartbeat(websocket))
     
     try:
-        # Envia informação de diagnóstico sobre o status do sistema
-        await websocket.send(json.dumps({
-            "status": "info",
-            "msg": f"Conectado ao servidor. Status do pair_monitor: {'Ativo' if pair_monitor else 'Inativo'}"
-        }))
+        # Aqui colocamos tratamento para suprimir erros de conexão
+        try:
+            # Envia informação de diagnóstico sobre o status do sistema
+            await websocket.send(json.dumps({
+                "status": "info",
+                "msg": f"Conectado ao servidor. Status do pair_monitor: {'Ativo' if pair_monitor else 'Inativo'}"
+            }))
+        except (ConnectionClosedError, ConnectionClosedOK):
+            # Cliente já desconectou, finalizar handler
+            return
         
-        # Se o pair_monitor já estiver inicializado, envia a lista atual
+        # Adicionar TODOS à lista de pares disponíveis
         if pair_monitor:
             try:
                 pairs = pair_monitor.get_available_pairs()
                 if pairs:
+                    # Adiciona "TODOS" como primeiro item
+                    pairs_with_todos = ["TODOS"] + pairs
                     await websocket.send(json.dumps({
                         "status": "pairs_list",
-                        "pairs": pairs
+                        "pairs": pairs_with_todos
                     }))
-                    print(f"Enviados {len(pairs)} pares para o cliente no momento da conexão")
+                    print(f"Enviados {len(pairs_with_todos)} pares (incluindo TODOS) para o cliente")
             except Exception as e:
                 print(f"Erro ao enviar pares iniciais: {str(e)}")
+        
+        # Usar uma variável para controlar a frequência de atualizações
+        last_update_time = 0
+        min_update_interval = 1  # Reduzido para 1 segundo (era 5)
         
         async for message in websocket:
             try:
                 data = json.loads(message)
-                print(f"[📩] Recebido: {data}")
+                print(f"[📩] Recebido {len(message)} bytes do cliente {client_id}")
+                
+                # Tratar comando de ping separadamente (mais leve)
+                if "command" in data and data["command"] == "ping":
+                    await websocket.send(json.dumps({"status": "pong"}))
+                    continue
+                
+                # Para outros comandos, mostra detalhes completos
+                print(f"[📩] Conteúdo: {data}")
                 
                 # Comando para verificar disponibilidade de um par específico
                 if "command" in data and data["command"] == "check_pair_availability" and "pair" in data:
                     pair = data["pair"]
-                    is_available = await check_pair_availability(pair)
+                    is_available = await verificar_par_disponivel(pair, iq)
                     await websocket.send(json.dumps({
                         "status": "pair_availability",
                         "pair": pair,
@@ -222,7 +338,10 @@ async def handler(websocket):
                 
                 # Comando especial para obter pares disponíveis
                 if "command" in data and data["command"] == "get_available_pairs":
-                    print("Recebida solicitação para atualizar pares disponíveis")
+                    # NÃO bloquear atualizações frequentes - isso pode causar problemas no frontend
+                    # O WebSocket deve ser stateless e responder a todas as solicitações
+                    last_update_time = time.time()  # Atualizar timestamp para registro
+                    print(f"Recebida solicitação para atualizar pares disponíveis do cliente {client_id}")
                     
                     # Tenta usar o pair_monitor se estiver disponível
                     if pair_monitor:
@@ -230,9 +349,13 @@ async def handler(websocket):
                             print("Atualizando pares via pair_monitor...")
                             pairs = await pair_monitor.update_available_pairs()
                             print(f"Encontrados {len(pairs)} pares disponíveis")
+                            
+                            # Adiciona "TODOS" como primeiro item
+                            pairs_with_todos = ["TODOS"] + pairs
+                            
                             await websocket.send(json.dumps({
                                 "status": "pairs_list", 
-                                "pairs": pairs
+                                "pairs": pairs_with_todos
                             }))
                         except Exception as e:
                             print(f"Erro ao atualizar pares via pair_monitor: {str(e)}")
@@ -246,8 +369,12 @@ async def handler(websocket):
                             print("Obtendo pares diretamente via API...")
                             all_pairs = iq.api.get_all_open_time()
                             
+                            # Garantir que o diretório de logs existe
+                            log_dir = ensure_log_directory()
+                            pairs_file = os.path.join(log_dir, "pairs_direct.json")
+                            
                             # Salvar para debug
-                            with open("../logs/pairs_direct.json", "w") as f:
+                            with open(pairs_file, "w") as f:
                                 json.dump(all_pairs, f, indent=2)
                             
                             available_pairs = []
@@ -255,8 +382,11 @@ async def handler(websocket):
                                 for pair, status in all_pairs["binary"].items():
                                     if status["open"]:
                                         available_pairs.append(pair)
+                            
+                            # Adiciona "TODOS" como primeiro item
+                            available_pairs = ["TODOS"] + available_pairs
                                         
-                            print(f"Encontrados {len(available_pairs)} pares diretamente")
+                            print(f"Encontrados {len(available_pairs)-1} pares diretamente")
                             await websocket.send(json.dumps({
                                 "status": "pairs_list", 
                                 "pairs": available_pairs
@@ -268,9 +398,10 @@ async def handler(websocket):
                                 "msg": f"Erro ao obter pares: {str(e)}"
                             }))
                     else:
+                        # Se não temos nenhuma fonte de pares, retornar pelo menos "TODOS"
                         await websocket.send(json.dumps({
-                            "status": "error", 
-                            "msg": "Não foi possível obter pares, robot não conectado"
+                            "status": "pairs_list", 
+                            "pairs": ["TODOS", "EURUSD", "USDJPY"]
                         }))
                     continue
                 
@@ -284,6 +415,14 @@ async def handler(websocket):
                     try:
                         print("[🚀] Inicializando bot IQ Option...")
                         iq = IQBot(EMAIL, SENHA)
+                        
+                        # Verificar se a conexão está ativa
+                        if not iq.check_connect():
+                            await websocket.send(json.dumps({
+                                "status": "erro", 
+                                "msg": "Falha na conexão com a IQ Option. Tente novamente."
+                            }))
+                            continue
                         
                         # Configure o tipo de conta ao conectar
                         if "tipo_conta" in data:
@@ -343,37 +482,84 @@ async def handler(websocket):
                     "msg": "Formato de dados inválido"
                 }))
                 
+            except (ConnectionClosedError, ConnectionClosedOK):
+                # O cliente foi desconectado durante o processamento, encerre o handler
+                print(f"[i] Cliente {client_id} desconectado durante processamento")
+                return
+                
             except Exception as e:
-                print(f"[❌] Erro ao processar mensagem: {str(e)}")
-                await websocket.send(json.dumps({
-                    "status": "erro", 
-                    "msg": f"Erro: {str(e)}"
-                }))
+                print(f"[❌] Erro ao processar mensagem do cliente {client_id}: {str(e)}")
+                try:
+                    await websocket.send(json.dumps({
+                        "status": "erro", 
+                        "msg": f"Erro: {str(e)}"
+                    }))
+                except (ConnectionClosedError, ConnectionClosedOK):
+                    # Cliente já desconectou, encerre o handler
+                    return
     
-    except websockets.exceptions.ConnectionClosed:
-        print("[i] Conexão fechada pelo cliente")
+    except (ConnectionClosedError, ConnectionClosedOK):
+        print(f"[i] Conexão fechada pelo cliente {client_id}")
+    except Exception as e:
+        print(f"[!] Erro na conexão com cliente {client_id}: {str(e)}")
+        logger.error(f"Erro no WebSocket: {str(e)}")
+        logger.error(traceback.format_exc())
     
     finally:
+        # Cancelar heartbeat de forma segura
+        try:
+            heartbeat_task.cancel()
+            await asyncio.sleep(0)  # Dar chance para o cancelamento ser processado
+        except:
+            pass
+        
         # Remove o cliente da lista quando desconectar
-        connected_clients.remove(websocket)
-        print(f"[-] Cliente desconectado. Total de clientes: {len(connected_clients)}")
+        if websocket in connected_clients:
+            connected_clients.remove(websocket)
+            print(f"[-] Cliente {client_id} desconectado. Total de clientes: {len(connected_clients)}")
+
+async def start_server():
+    """Inicializa o servidor WebSocket com configurações otimizadas"""
+    print("[🚀] Iniciando servidor WebSocket na porta 6789...")
+    
+    # Configurar o servidor com parâmetros otimizados de conexão
+    server = await websockets.serve(
+        handler, 
+        "localhost", 
+        6789,
+        ping_interval=30,       # Envia ping a cada 30 segundos
+        ping_timeout=10,        # Timeout do ping em 10 segundos
+        close_timeout=10,       # Timeout para fechamento de conexão
+        max_size=10485760,      # 10MB de tamanho máximo de mensagem
+        max_queue=32            # Tamanho da fila de mensagens
+    )
+    
+    print("[✅] Servidor WebSocket iniciado e aguardando conexões")
+    return server
 
 async def main():
-    print("[🚀] Servidor WebSocket iniciado na porta 6789")
-    print("[i] Aguardando conexões...")
+    print("[i] Iniciando Robô Trader v2.0...")
     
-    async with websockets.serve(handler, "localhost", 6789):
-        # Inicia a tarefa do robô
-        bot_task = asyncio.create_task(executar_robô())
-        
-        # Mantém o servidor rodando indefinidamente
-        await asyncio.Future()
+    # Garantir que o diretório de logs exista antes de iniciar
+    ensure_log_directory()
+    
+    # Iniciar o servidor WebSocket com configurações otimizadas
+    server = await start_server()
+    
+    # Inicia a tarefa do robô
+    bot_task = asyncio.create_task(executar_robô())
+    
+    # Mantém o servidor rodando indefinidamente
+    await asyncio.Future()
 
 if __name__ == "__main__":
     try:
         if args.debug:
             print("Modo de debug ativado. Logs detalhados serão salvos.")
             logger.setLevel(logging.DEBUG)
+        
+        # Garantir que o diretório de logs exista antes de iniciar
+        ensure_log_directory()
         
         asyncio.run(main())
     except KeyboardInterrupt:

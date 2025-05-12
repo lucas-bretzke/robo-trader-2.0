@@ -74,6 +74,23 @@ class IQBot:
         direcao = direcao.lower()
         return "call" if direcao == "call" else "put"
 
+    def verificar_par_suportado(self, par):
+        """Verifica se um par é suportado pela API IQ Option"""
+        try:
+            # Verifica se o par está nos ativos conhecidos pela API
+            from iqoptionapi.constants import OP_code
+            return par in OP_code.ACTIVES
+        except Exception as e:
+            print(f"[⚠️] Erro ao verificar se o par {par} é suportado: {str(e)}")
+            return False
+            
+    def check_connect(self):
+        """Verifica se a conexão com a API está ativa"""
+        try:
+            return self.api.check_connect()
+        except:
+            return False
+
     def entrar(self, direcao, martingale=False, multiplicador=2, max_mg=2):
         direcao = self.verificar_direcao(direcao)
         tentativa = 0
@@ -84,12 +101,22 @@ class IQBot:
                 # Registra a tentativa para debug
                 log_trade_attempt(self.par, direcao, valor, self.tempo)
                 
-                # Verifica se o par está disponível
+                # Tratamento especial para o modo "TODOS"
+                if self.par.upper() == "TODOS":
+                    print(f"[⚠️] ERRO: Não é possível operar diretamente no modo TODOS")
+                    return False, 0
+                
+                # Verificar se o par está disponível
                 pares_abertos = self.api.get_all_open_time()
                 if pares_abertos is not None:
                     log_api_response(pares_abertos, "get_all_open_time")
+                
+                # Verificar se o par está nos ativos conhecidos pela API
+                if not self.verificar_par_suportado(self.par):
+                    print(f"[❌] ERRO: Par {self.par} não é suportado pela API IQ Option")
+                    return False, 0
                     
-                if pares_abertos and self.par in pares_abertos['binary'] and pares_abertos['binary'][self.par]['open']:
+                if pares_abertos and "binary" in pares_abertos and self.par in pares_abertos['binary'] and pares_abertos['binary'][self.par]['open']:
                     print(f"[i] Par {self.par} está disponível para negociação")
                 else:
                     print(f"[❌] ERRO: Par {self.par} não está disponível para negociação")

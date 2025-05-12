@@ -29,6 +29,16 @@ Se você receber erros de WebSocket no frontend:
 - Confirme se sua conta IQ Option está ativa
 - Verifique sua conexão com a internet
 
+### 4. Erro "O par TODOS não está disponível para negociação agora"
+
+Este erro ocorre porque "TODOS" é uma opção especial do frontend, não um par real de negociação.
+
+**Solução:**
+
+- Verifique se você está usando a versão mais recente do backend
+- Se o erro persistir, execute o script `verificar_par.py` para testes adicionais
+- Consulte a documentação para entender como o modo "TODOS" funciona
+
 ## Como executar corretamente o robô:
 
 1. Abra um terminal e navegue até a pasta do projeto:

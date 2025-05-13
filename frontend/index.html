@@ -1,166 +1,19 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Robô IQ Option</title>
-    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/robot.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>IQ Option Trader</title>
   </head>
   <body>
-    <div class="container">
-      <div class="header">
-        <h2>Robô IQ Option</h2>
-
-        <!-- Status do Robô com switch -->
-        <div class="robot-status-container">
-          <span id="status-text" class="status-text inactive"
-            >Robô: DESLIGADO</span
-          >
-          <label class="switch">
-            <input
-              type="checkbox"
-              id="robot-status-switch"
-              onchange="toggleRobo()"
-            />
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="status-indicator" id="connection-status">
-          Estado da conexão: Desconectado
-        </div>
-      </div>
-
-      <div class="left-panel">
-        <div class="section">
-          <div class="section-title">Configuração de Conta</div>
-          <div class="form-group">
-            <label for="tipo_conta">Tipo de Conta</label>
-            <select id="tipo_conta">
-              <option value="PRACTICE">Conta Demo</option>
-              <option value="REAL">Conta Real</option>
-            </select>
-            <div
-              id="account-warning"
-              class="account-warning"
-              style="display: none"
-            >
-              Usando Conta Real - Cuidado!
-            </div>
-          </div>
-        </div>
-
-        <div class="section">
-          <div class="section-title">Parâmetros de Operação</div>
-          <div class="two-columns">
-            <div class="form-group">
-              <label for="valor">Valor da entrada (R$)</label>
-              <input type="number" id="valor" value="10" />
-            </div>
-
-            <div class="form-group">
-              <label for="tempo">Expiração (min)</label>
-              <input type="number" id="tempo" value="5" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="par">Par de moedas</label>
-            <select id="par">
-              <option value="TODOS">TODOS - Monitorar todos os pares</option>
-              <option value="EURUSD">EUR/USD</option>
-              <option value="USDJPY">USD/JPY</option>
-            </select>
-            <div class="pair-status">
-              <span id="pair-count" class="badge">0 pares disponíveis</span>
-              <button
-                type="button"
-                id="refresh-pairs"
-                class="refresh-btn"
-                title="Recarregar lista de pares disponíveis"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  fill="currentColor"
-                  viewBox="0 0 16 16"
-                >
-                  <path
-                    d="M8 3a5 5 0 1 0 0 10A5 5 0 0 0 8 3zm4.5 5.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0z"
-                  />
-                  <path
-                    d="M8.5 5.5a.5.5 0 0 0-1 0v2.5H6a.5.5 0 0 0 0 1h2a.5.5 0 0 0 .5-.5z"
-                  />
-                </svg>
-              </button>
-              <button
-                type="button"
-                id="diagnose-pair"
-                class="diagnose-btn"
-                title="Diagnosticar disponibilidade de par selecionado"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  fill="currentColor"
-                  viewBox="0 0 16 16"
-                >
-                  <path
-                    d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="section">
-          <div class="section-title">Configuração de Martingale</div>
-          <div class="two-columns">
-            <div class="form-group">
-              <label for="usar_mg">Habilitar Martingale</label>
-              <select id="usar_mg">
-                <option value="true">Sim</option>
-                <option value="false">Não</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="multiplicador">Multiplicador</label>
-              <input type="number" id="multiplicador" value="2" />
-            </div>
-
-            <div class="form-group">
-              <label for="max_mg">Máximo de Martingales</label>
-              <input type="number" id="max_mg" value="3" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Adding Test Entry Button -->
-        <div class="section">
-          <button id="test-entry-btn" class="action-button">
-            Testar Entrada
-          </button>
-          <small class="helper-text"
-            >Faz uma entrada teste com as configurações atuais</small
-          >
-        </div>
-      </div>
-
-      <div class="right-panel">
-        <div class="log-header">
-          <h3>Log de Operações:</h3>
-          <button id="clear-log">Limpar Log</button>
-        </div>
-        <div class="log" id="log"></div>
-      </div>
-    </div>
-
-    <!-- Incluir primeiro o WebSocket client robusto -->
-    <script src="websocket_client.js"></script>
-    <!-- Em seguida o script principal que o utiliza -->
-    <script src="script.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

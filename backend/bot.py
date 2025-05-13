@@ -84,12 +84,80 @@ async def get_available_pairs():
     """Retorna os pares de moedas disponíveis para o cliente"""
     global iq, pair_monitor
     
-    if not pair_monitor or not iq:
-        return ["EURUSD", "USDJPY"]  # Pares padrão como fallback
-        
+    all_pairs = []
+    
     try:
-        pairs = await pair_monitor.update_available_pairs()
-        return pairs
+        if iq is None:
+            logger.warning("IQ não inicializado ao obter pares disponíveis")
+            return ["EURUSD", "USDJPY"]  # Pares padrão como fallback
+            
+        # Obter pares de todos os mercados disponíveis
+        all_open_time = iq.api.get_all_open_time()
+        
+        # Processar cada tipo de mercado
+        for market_type in ["binary", "turbo", "digital"]:
+            if market_type in all_open_time:
+                logger.info(f"Processando mercado: {market_type}")
+                
+                # Para o tipo digital, usamos abordagem diferente
+                if market_type == "digital":
+                    try:
+                        if hasattr(iq.api, 'get_digital_underlying'):
+                            digital_pairs = iq.api.get_digital_underlying()
+                            logger.info(f"Encontrados {len(digital_pairs)} pares digitais")
+                            
+                            for pair_name in digital_pairs:
+                                digital_pair = f"DIGITAL_{pair_name}"
+                                if digital_pair not in all_pairs:
+                                    all_pairs.append(digital_pair)
+                    except Exception as e:
+                        logger.error(f"Erro ao obter pares digitais: {str(e)}")
+                else:
+                    # Processamento para pares regulares (binary, turbo)
+                    for pair_name, pair_status in all_open_time[market_type].items():
+                        # Verificar se é dict ou booleano
+                        is_open = False
+                        if isinstance(pair_status, dict) and "open" in pair_status:
+                            is_open = pair_status["open"]
+                        elif isinstance(pair_status, bool):
+                            is_open = pair_status
+                            
+                        if is_open:
+                            # Adicionar prefixo apenas para pares não binários para evitar confusão
+                            formatted_name = pair_name
+                            if market_type != "binary":
+                                formatted_name = f"{market_type.upper()}_{pair_name}"
+                                
+                            if formatted_name not in all_pairs:
+                                all_pairs.append(formatted_name)
+        
+        # Buscar também por pares OTC
+        try:
+            binary_pairs = all_open_time.get("binary", {})
+            otc_pairs = [pair for pair in binary_pairs if "OTC" in pair and binary_pairs[pair].get("open", False)]
+            logger.info(f"Encontrados {len(otc_pairs)} pares OTC")
+            
+            for pair in otc_pairs:
+                if pair not in all_pairs:
+                    all_pairs.append(pair)
+        except Exception as e:
+            logger.error(f"Erro ao processar pares OTC: {str(e)}")
+                    
+        logger.info(f"Total de {len(all_pairs)} pares disponíveis")
+        
+        # Salvar pares para diagnóstico
+        try:
+            log_dir = ensure_log_directory()
+            with open(os.path.join(log_dir, "available_pairs.json"), "w") as f:
+                json.dump({
+                    "timestamp": time.time(),
+                    "pairs": all_pairs,
+                    "raw_data": all_open_time
+                }, f, indent=2)
+        except Exception as e:
+            logger.error(f"Erro ao salvar pares para diagnóstico: {str(e)}")
+            
+        return all_pairs
     except Exception as e:
         logger.error(f"Erro ao obter pares disponíveis: {str(e)}")
         return ["EURUSD", "USDJPY"]  # Fallback em caso de erro
@@ -242,17 +310,32 @@ async def executar_robô():
         await asyncio.sleep(5)
 
 async def notify_clients(message):
-    """Envia uma mensagem para todos os clientes conectados"""
+    """Envia uma mensagem para todos os clientes conectados com tratamento melhorado de erros"""
     if connected_clients:
         data = json.dumps({"status": "info", "msg": message})
-        await asyncio.gather(*[client.send(data) for client in connected_clients])
+        
+        # Usar uma lista para rastrear clientes com erro
+        problem_clients = []
+        
+        for client in connected_clients:
+            try:
+                await client.send(data)
+            except Exception as e:
+                print(f"Erro ao enviar mensagem para cliente: {e}")
+                problem_clients.append(client)
+        
+        # Remover clientes problemáticos da lista
+        for client in problem_clients:
+            if client in connected_clients:
+                connected_clients.remove(client)
+                print(f"Cliente removido da lista devido a erro de comunicação")
 
 async def websocket_heartbeat(websocket):
     """Envia heartbeats periódicos para manter a conexão ativa"""
     try:
         counter = 0
         while True:
-            # A cada 30 segundos, enviar um heartbeat completo
+            # A cada 15 segundos, enviar um heartbeat completo (reduzido de 30 segundos)
             await websocket.send(json.dumps({
                 "status": "heartbeat",
                 "counter": counter,
@@ -262,7 +345,7 @@ async def websocket_heartbeat(websocket):
             
             # Fazer sleep em intervalos menores para responder mais rapidamente
             # se a tarefa for cancelada
-            for _ in range(30):
+            for _ in range(15):  # 15 intervalos de 1 segundo = 15 segundos total
                 await asyncio.sleep(1)
     except (ConnectionClosedError, ConnectionClosedOK, asyncio.CancelledError):
         # Conexão fechada normalmente, não precisa logar
@@ -287,7 +370,8 @@ async def handler(websocket):
             # Envia informação de diagnóstico sobre o status do sistema
             await websocket.send(json.dumps({
                 "status": "info",
-                "msg": f"Conectado ao servidor. Status do pair_monitor: {'Ativo' if pair_monitor else 'Inativo'}"
+                "msg": f"Conectado ao servidor. Status do pair_monitor: {'Ativo' if pair_monitor else 'Inativo'}",
+                "robo_status": config["ligado"]  # Enviar status atual do robô
             }))
         except (ConnectionClosedError, ConnectionClosedOK):
             # Cliente já desconectou, finalizar handler
@@ -315,14 +399,14 @@ async def handler(websocket):
         async for message in websocket:
             try:
                 data = json.loads(message)
-                print(f"[📩] Recebido {len(message)} bytes do cliente {client_id}")
                 
                 # Tratar comando de ping separadamente (mais leve)
                 if "command" in data and data["command"] == "ping":
-                    await websocket.send(json.dumps({"status": "pong"}))
+                    await websocket.send(json.dumps({"status": "pong", "timestamp": time.time()}))
                     continue
                 
                 # Para outros comandos, mostra detalhes completos
+                print(f"[📩] Recebido {len(message)} bytes do cliente {client_id}")
                 print(f"[📩] Conteúdo: {data}")
                 
                 # Comando para verificar disponibilidade de um par específico
@@ -338,70 +422,33 @@ async def handler(websocket):
                 
                 # Comando especial para obter pares disponíveis
                 if "command" in data and data["command"] == "get_available_pairs":
-                    # NÃO bloquear atualizações frequentes - isso pode causar problemas no frontend
-                    # O WebSocket deve ser stateless e responder a todas as solicitações
-                    last_update_time = time.time()  # Atualizar timestamp para registro
+                    last_update_time = time.time()
                     print(f"Recebida solicitação para atualizar pares disponíveis do cliente {client_id}")
                     
-                    # Tenta usar o pair_monitor se estiver disponível
-                    if pair_monitor:
-                        try:
-                            print("Atualizando pares via pair_monitor...")
-                            pairs = await pair_monitor.update_available_pairs()
-                            print(f"Encontrados {len(pairs)} pares disponíveis")
-                            
-                            # Adiciona "TODOS" como primeiro item
-                            pairs_with_todos = ["TODOS"] + pairs
-                            
-                            await websocket.send(json.dumps({
-                                "status": "pairs_list", 
-                                "pairs": pairs_with_todos
-                            }))
-                        except Exception as e:
-                            print(f"Erro ao atualizar pares via pair_monitor: {str(e)}")
-                            await websocket.send(json.dumps({
-                                "status": "error", 
-                                "msg": f"Erro ao obter pares: {str(e)}"
-                            }))
-                    # Fallback: tentar obter pares diretamente
-                    elif iq:
-                        try:
-                            print("Obtendo pares diretamente via API...")
-                            all_pairs = iq.api.get_all_open_time()
-                            
-                            # Garantir que o diretório de logs existe
-                            log_dir = ensure_log_directory()
-                            pairs_file = os.path.join(log_dir, "pairs_direct.json")
-                            
-                            # Salvar para debug
-                            with open(pairs_file, "w") as f:
-                                json.dump(all_pairs, f, indent=2)
-                            
-                            available_pairs = []
-                            if "binary" in all_pairs:
-                                for pair, status in all_pairs["binary"].items():
-                                    if status["open"]:
-                                        available_pairs.append(pair)
-                            
-                            # Adiciona "TODOS" como primeiro item
-                            available_pairs = ["TODOS"] + available_pairs
-                                        
-                            print(f"Encontrados {len(available_pairs)-1} pares diretamente")
-                            await websocket.send(json.dumps({
-                                "status": "pairs_list", 
-                                "pairs": available_pairs
-                            }))
-                        except Exception as e:
-                            print(f"Erro ao obter pares diretamente: {str(e)}")
-                            await websocket.send(json.dumps({
-                                "status": "error", 
-                                "msg": f"Erro ao obter pares: {str(e)}"
-                            }))
-                    else:
-                        # Se não temos nenhuma fonte de pares, retornar pelo menos "TODOS"
+                    # Flag para incluir todos os mercados
+                    include_all_markets = data.get("include_all_markets", False)
+                    
+                    try:
+                        # Atualizar pares via função dedicada
+                        print("Obtendo lista completa de pares disponíveis...")
+                        all_pairs = await get_available_pairs()
+                        
+                        # Adiciona "TODOS" como primeiro item
+                        all_pairs_with_todos = ["TODOS"] + all_pairs
+                        
+                        print(f"Enviando {len(all_pairs)} pares disponíveis para o cliente")
+                        
                         await websocket.send(json.dumps({
                             "status": "pairs_list", 
-                            "pairs": ["TODOS", "EURUSD", "USDJPY"]
+                            "pairs": all_pairs_with_todos,
+                            "count": len(all_pairs),
+                            "timestamp": time.time()
+                        }))
+                    except Exception as e:
+                        print(f"Erro ao obter pares disponíveis: {str(e)}")
+                        await websocket.send(json.dumps({
+                            "status": "error", 
+                            "msg": f"Erro ao obter pares disponíveis: {str(e)}"
                         }))
                     continue
                 
@@ -509,7 +556,7 @@ async def handler(websocket):
         # Cancelar heartbeat de forma segura
         try:
             heartbeat_task.cancel()
-            await asyncio.sleep(0)  # Dar chance para o cancelamento ser processado
+            await asyncio.shield(asyncio.sleep(0))  # Dar chance para o cancelamento ser processado
         except:
             pass
         
@@ -527,11 +574,12 @@ async def start_server():
         handler, 
         "localhost", 
         6789,
-        ping_interval=30,       # Envia ping a cada 30 segundos
-        ping_timeout=10,        # Timeout do ping em 10 segundos
-        close_timeout=10,       # Timeout para fechamento de conexão
+        ping_interval=20,       # Envia ping a cada 20 segundos
+        ping_timeout=30,        # Timeout do ping aumentado para 30 segundos
+        close_timeout=30,       # Timeout para fechamento de conexão aumentado
         max_size=10485760,      # 10MB de tamanho máximo de mensagem
-        max_queue=32            # Tamanho da fila de mensagens
+        max_queue=64,           # Aumentado o tamanho da fila de mensagens
+        compression=None        # Desabilitar compressão para reduzir sobrecarga
     )
     
     print("[✅] Servidor WebSocket iniciado e aguardando conexões")

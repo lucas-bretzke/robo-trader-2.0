@@ -54,4 +54,12 @@ def log_api_response(response, operation_type="unknown"):
 def log_trade_attempt(pair, direction, amount, expiration):
     """Registra tentativas de operação para debug"""
     logger = logging.getLogger('robo_trader')
-    logger.info(f"TRADE ATTEMPT: Pair={pair}, Direction={direction}, Amount={amount}, Expiration={expiration}")
+    market_type = "standard"
+    
+    # Detectar tipo de mercado a partir do nome do par
+    if pair.startswith("DIGITAL_"):
+        market_type = "digital"
+    elif "_" in pair:
+        market_type = pair.split("_", 1)[0].lower()
+        
+    logger.info(f"TRADE ATTEMPT: Pair={pair}, Market={market_type}, Direction={direction}, Amount={amount}, Expiration={expiration}")

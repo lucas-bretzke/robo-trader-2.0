@@ -81,43 +81,91 @@ class PairMonitor:
             if not all_pairs:
                 logger.warning("API retornou dados vazios para pares disponíveis")
                 return []
-                
-            if "binary" not in all_pairs and "turbo" in all_pairs:
-                # Alguns servidores usam "turbo" em vez de "binary"
-                logger.info("Usando 'turbo' como alternativa para 'binary'")
-                all_pairs["binary"] = all_pairs["turbo"]
-                
-            if "binary" not in all_pairs:
-                logger.warning("Chave 'binary' não encontrada na resposta da API")
-                # Tentar outras chaves possíveis
-                possible_keys = list(all_pairs.keys())
-                logger.info(f"Chaves disponíveis: {possible_keys}")
-                
-                # Se tiver pelo menos uma chave, usar a primeira
-                if possible_keys:
-                    logger.info(f"Usando '{possible_keys[0]}' como alternativa")
-                    all_pairs["binary"] = all_pairs[possible_keys[0]]
-                else:
-                    return []
             
+            # Detectar todos os tipos de mercado disponíveis
             available = {}
-            for pair_name, pair_status in all_pairs["binary"].items():
-                if isinstance(pair_status, dict) and "open" in pair_status and pair_status["open"]:
-                    available[pair_name] = {
-                        "open": True,
-                        "timestamp": time.time()
-                    }
+            market_types = all_pairs.keys()  # Usar todas as chaves retornadas pela API
             
-            # Para suporte a diferentes versões da API
+            # Processar cada tipo de mercado
+            for market_type in market_types:
+                logger.info(f"Processando mercado: {market_type}")
+                    
+                # Digital precisa de tratamento especial
+                if market_type == "digital":
+                    # Tratamento especial para opções digitais
+                    try:
+                        digital_pairs = self._get_digital_pairs()
+                        for pair in digital_pairs:
+                            pair_key = f"DIGITAL_{pair}"
+                            available[pair_key] = {
+                                "open": True,
+                                "type": "digital",
+                                "timestamp": time.time()
+                            }
+                        logger.info(f"Adicionados {len(digital_pairs)} pares digitais")
+                    except Exception as e:
+                        logger.error(f"Erro ao obter pares digitais: {str(e)}")
+                else:
+                    # Processamento para os outros mercados (binary, turbo, etc)
+                    for pair_name, pair_status in all_pairs[market_type].items():
+                        # Verificar se é um dicionário com chave "open"
+                        if isinstance(pair_status, dict) and "open" in pair_status:
+                            if pair_status["open"]:
+                                pair_key = f"{market_type.upper()}_{pair_name}" if market_type != "binary" else pair_name
+                                available[pair_key] = {
+                                    "open": True,
+                                    "type": market_type,
+                                    "timestamp": time.time()
+                                }
+                        # Algumas versões da API retornam apenas um booleano
+                        elif isinstance(pair_status, bool) and pair_status:
+                            pair_key = f"{market_type.upper()}_{pair_name}" if market_type != "binary" else pair_name
+                            available[pair_key] = {
+                                "open": True,
+                                "type": market_type,
+                                "timestamp": time.time()
+                            }
+            
+            # Verificar outros mercados alternativos usando consulta direta
+            try:
+                # Obter informações de lucro para detectar mais pares disponíveis
+                profit_data = self.iq_bot.api.get_all_profit()
+                if isinstance(profit_data, dict):
+                    for asset_id, info in profit_data.items():
+                        if isinstance(info, dict) and "name" in info:
+                            asset_name = info["name"]
+                            if asset_name not in available:
+                                # Verificar se este ativo está disponível nos mercados conhecidos
+                                for market_type in ["binary", "turbo"]:
+                                    if market_type in all_pairs and asset_name in all_pairs[market_type]:
+                                        status = all_pairs[market_type][asset_name]
+                                        is_open = status.get("open", False) if isinstance(status, dict) else status
+                                        if is_open:
+                                            available[asset_name] = {
+                                                "open": True,
+                                                "type": market_type,
+                                                "timestamp": time.time()
+                                            }
+                                            break
+            except Exception as e:
+                logger.error(f"Erro ao obter dados adicionais de pares: {str(e)}")
+            
+            # Verificar se temos algum par disponível
             if not available:
-                logger.warning("Formato de resposta diferente do esperado, tentando alternativa...")
-                for pair_name, pair_status in all_pairs["binary"].items():
-                    # Algumas versões da API retornam apenas um booleano
-                    if isinstance(pair_status, bool) and pair_status:
-                        available[pair_name] = {
+                logger.warning("Nenhum par disponível encontrado em nenhum mercado")
+                    
+                # Tente recuperar opções digitais como fallback
+                try:
+                    digital_pairs = self._get_digital_pairs()
+                    for pair in digital_pairs:
+                        pair_key = f"DIGITAL_{pair}"
+                        available[pair_key] = {
                             "open": True,
+                            "type": "digital", 
                             "timestamp": time.time()
                         }
+                except Exception as e:
+                    logger.error(f"Erro ao obter pares digitais fallback: {str(e)}")
             
             self.available_pairs = available
             self.last_update = datetime.now()
@@ -133,14 +181,45 @@ class PairMonitor:
             import traceback
             logger.error(traceback.format_exc())
             return []
-            
+    
+    def _get_digital_pairs(self):
+        """Obtém a lista de pares disponíveis para opções digitais"""
+        if not self.iq_bot or not hasattr(self.iq_bot, 'api'):
+            return []
+        
+        try:
+            # Usar o método específico para opções digitais quando disponível
+            if hasattr(self.iq_bot.api, 'get_digital_underlying'):
+                return self.iq_bot.api.get_digital_underlying()
+            else:
+                logger.warning("Método get_digital_underlying não disponível na API")
+                return []
+        except Exception as e:
+            logger.error(f"Erro ao obter pares digitais: {str(e)}")
+            return []
+    
     def _save_pairs_to_file(self):
         """Salva a lista de pares em um arquivo para consulta pelo frontend"""
         try:
+            # Organizar pares por tipo de mercado para interface mais clara
+            organized_pairs = {}
+            for pair, data in self.available_pairs.items():
+                market_type = data.get("type", "unknown")
+                if market_type not in organized_pairs:
+                    organized_pairs[market_type] = []
+                
+                # Remover prefixo do tipo para pares não-binary se já estiver no nome
+                display_name = pair
+                if market_type != "binary" and pair.startswith(f"{market_type.upper()}_"):
+                    display_name = pair.split("_", 1)[1]
+                
+                organized_pairs[market_type].append(display_name)
+            
             pairs_data = {
                 "timestamp": time.time(),
                 "datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "pairs": list(self.available_pairs.keys())
+                "pairs": list(self.available_pairs.keys()),
+                "organized": organized_pairs
             }
             
             frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")

@@ -25,6 +25,9 @@ logging.basicConfig(level=logging.ERROR,
                     format='%(asctime)s %(levelname)s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
 
+# Logger específico para esta classe
+logger = logging.getLogger('iq_bot')
+
 class IQBot:
     def __init__(self, email, senha):
         self.email = email
@@ -77,13 +80,74 @@ class IQBot:
     def verificar_par_suportado(self, par):
         """Verifica se um par é suportado pela API IQ Option"""
         try:
+            # Verifica se é par digital (formato DIGITAL_EURUSD)
+            if par.startswith("DIGITAL_"):
+                # Extrair o par subjacente (EURUSD da parte DIGITAL_EURUSD)
+                underlying = par.split("_", 1)[1]
+                
+                # Verificar se o subjacente está nos ativos digitais disponíveis
+                if hasattr(self.api, 'get_digital_underlying'):
+                    available_digital = self.api.get_digital_underlying()
+                    return underlying in available_digital
+                return False
+            
+            # Verifica se é par de outro mercado específico (formato TURBO_EURUSD, CFD_EURUSD, etc.)
+            if "_" in par:
+                market, underlying = par.split("_", 1)
+                
+                # Verificar se o mercado existe e se o par está disponível nele
+                all_pairs = self.api.get_all_open_time()
+                market = market.lower()
+                if market in all_pairs and underlying in all_pairs[market]:
+                    return all_pairs[market][underlying]["open"] if isinstance(all_pairs[market][underlying], dict) else all_pairs[market][underlying]
+                return False
+                
+            # Pares regulares (binário/turbo) - verificação padrão
             # Verifica se o par está nos ativos conhecidos pela API
             from iqoptionapi.constants import OP_code
-            return par in OP_code.ACTIVES
+            is_known = par in OP_code.ACTIVES
+            
+            # Verificação adicional para garantir que o par está disponível
+            if is_known:
+                all_pairs = self.api.get_all_open_time()
+                for market in ["binary", "turbo"]:
+                    if market in all_pairs and par in all_pairs[market]:
+                        is_available = all_pairs[market][par]["open"] if isinstance(all_pairs[market][par], dict) else all_pairs[market][par]
+                        if is_available:
+                            return True
+            
+            # Verificar outras possibilidades para o par
+            return self.check_alternative_markets(par)
+            
         except Exception as e:
             print(f"[⚠️] Erro ao verificar se o par {par} é suportado: {str(e)}")
+            logger.error(f"Erro ao verificar par {par}: {str(e)}")
+            import traceback
+            logger.debug(traceback.format_exc())
             return False
+    
+    def check_alternative_markets(self, par):
+        """Verifica se um par está disponível em mercados alternativos"""
+        try:
+            # Tentar mercados diferentes para o mesmo par
+            all_pairs = self.api.get_all_open_time()
+            available_markets = all_pairs.keys()
             
+            # Logar os mercados disponíveis para debug
+            logger.debug(f"Mercados disponíveis: {available_markets}")
+            
+            for market in available_markets:
+                if market != "binary" and par in all_pairs[market]:
+                    is_available = all_pairs[market][par]["open"] if isinstance(all_pairs[market][par], dict) else all_pairs[market][par]
+                    if is_available:
+                        logger.info(f"Par {par} encontrado disponível no mercado {market}")
+                        return True
+            
+            return False
+        except Exception as e:
+            logger.error(f"Erro ao verificar mercados alternativos: {str(e)}")
+            return False
+    
     def check_connect(self):
         """Verifica se a conexão com a API está ativa"""
         try:
@@ -106,40 +170,65 @@ class IQBot:
                     print(f"[⚠️] ERRO: Não é possível operar diretamente no modo TODOS")
                     return False, 0
                 
-                # Verificar se o par está disponível
-                pares_abertos = self.api.get_all_open_time()
-                if pares_abertos is not None:
-                    log_api_response(pares_abertos, "get_all_open_time")
+                # Verificar se é um par digital
+                is_digital = self.par.startswith("DIGITAL_")
                 
-                # Verificar se o par está nos ativos conhecidos pela API
-                if not self.verificar_par_suportado(self.par):
-                    print(f"[❌] ERRO: Par {self.par} não é suportado pela API IQ Option")
-                    return False, 0
-                    
-                if pares_abertos and "binary" in pares_abertos and self.par in pares_abertos['binary'] and pares_abertos['binary'][self.par]['open']:
-                    print(f"[i] Par {self.par} está disponível para negociação")
+                # Verificar se o par está disponível - com tratamento para diferentes tipos
+                disponivel = False
+                
+                if is_digital:
+                    # Extrair nome do par sem prefixo DIGITAL_
+                    underlying = self.par.split("_", 1)[1]
+                    try:
+                        digital_availables = self.api.get_digital_underlying()
+                        disponivel = underlying in digital_availables
+                        print(f"[i] Par digital {underlying} verificado. Disponível: {disponivel}")
+                    except Exception as e:
+                        print(f"[⚠️] Erro ao verificar disponibilidade do par digital {underlying}: {str(e)}")
                 else:
+                    # Para outros tipos de pares, verificar normalmente
+                    pares_abertos = self.api.get_all_open_time()
+                    log_api_response(pares_abertos, "get_all_open_time")
+                    
+                    # Verificar se é um par de mercado específico (TURBO_XYZ, CFD_XYZ)
+                    if "_" in self.par:
+                        market, underlying = self.par.split("_", 1)
+                        market = market.lower()
+                        
+                        if market in pares_abertos and underlying in pares_abertos[market]:
+                            disponivel = pares_abertos[market][underlying]["open"] if isinstance(pares_abertos[market][underlying], dict) else pares_abertos[market][underlying]
+                    else:
+                        # Verificação padrão para pares binários
+                        if "binary" in pares_abertos and self.par in pares_abertos['binary']:
+                            disponivel = pares_abertos['binary'][self.par]["open"] if isinstance(pares_abertos['binary'][self.par], dict) else pares_abertos['binary'][self.par]
+                        elif "turbo" in pares_abertos and self.par in pares_abertos['turbo']:
+                            disponivel = pares_abertos['turbo'][self.par]["open"] if isinstance(pares_abertos['turbo'][self.par], dict) else pares_abertos['turbo'][self.par]
+                
+                if not disponivel:
                     print(f"[❌] ERRO: Par {self.par} não está disponível para negociação")
                     return False, 0
                 
-                # Verifica se o tempo de expiração é válido
-                exp_modes = self.api.get_all_profit()
-                log_api_response(exp_modes, "get_all_profit")
+                print(f"[i] Par {self.par} está disponível para negociação")
                 
-                # Certifica-se de que estamos usando um tempo de expiração válido em minutos
-                tempo_expiracao = self.tempo
-                # Para expiração em minutos, use M1, M5, M15 etc
-                tempo_expiracao_str = f"M{self.tempo}"
+                # Executa a operação de acordo com o tipo de par
+                if is_digital:
+                    # Operação para opções digitais
+                    underlying = self.par.split("_", 1)[1]
+                    print(f"[i] Tentando realizar operação DIGITAL: {direcao.upper()} em {underlying} com valor {valor}")
+                    
+                    # Opções digitais usam um método diferente
+                    status, id = self.api.buy_digital_spot(underlying, valor, direcao, self.tempo)
+                else:
+                    # Operação para opções binárias tradicionais
+                    print(f"[i] Tentando realizar operação: {direcao.upper()} em {self.par} com valor {valor}")
+                    status, id = self.api.buy(valor, self.par, direcao, self.tempo)
                 
-                # Faz a compra com timeout adequado
-                print(f"[i] Tentando realizar operação: {direcao.upper()} em {self.par} com valor {valor}")
-                status, id = self.api.buy(valor, self.par, direcao, tempo_expiracao)
                 log_api_response({"status": status, "id": id}, "buy")
                 
                 if status:
                     print(f"[+] Entrada: {valor} | Direção: {direcao.upper()} | Tentativa: {tentativa}")
                     # Espere pelo resultado com timeout adequado
-                    timeout = tempo_expiracao * 60 + 30  # tempo em segundos + 30s de margem
+                    timeout = self.tempo * 60 + 30  # tempo em segundos + 30s de margem
                     start_time = time.time()
                     
                     while time.time() - start_time < timeout:

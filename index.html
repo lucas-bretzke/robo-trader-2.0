@@ -68,184 +68,199 @@
       </div>
 
       <div class="main-content hidden" id="main-content">
-        <div class="panel">
-          <h3>Configurações</h3>
+        <div class="grid-layout">
+          <!-- Primeira coluna -->
+          <div class="column">
+            <div class="panel config-panel">
+              <h3>Configurações</h3>
 
-          <div class="config-section">
-            <h4>Ativos</h4>
-            <div class="search-container">
-              <input
-                type="text"
-                id="asset-search"
-                placeholder="Buscar ativo..."
-              />
-            </div>
-            <div class="assets-container">
-              <div id="selected-assets" class="selected-assets">
-                <p>Nenhum ativo selecionado</p>
+              <div class="config-grid">
+                <div class="config-section">
+                  <h4>Ativos</h4>
+                  <div class="search-container">
+                    <input
+                      type="text"
+                      id="asset-search"
+                      placeholder="Buscar ativo..."
+                    />
+                  </div>
+                  <div class="assets-container">
+                    <div id="selected-assets" class="selected-assets">
+                      <p>Nenhum ativo selecionado</p>
+                    </div>
+                    <div class="assets-list" id="assets-list">
+                      <p>Carregando ativos...</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="config-column">
+                  <div class="config-section">
+                    <h4>Tempo</h4>
+                    <div class="time-settings">
+                      <div class="setting">
+                        <label for="candle-time">Tempo de vela:</label>
+                        <select id="candle-time">
+                          <option value="60" selected>1 minuto</option>
+                          <option value="300">5 minutos</option>
+                          <option value="900">15 minutos</option>
+                          <option value="3600">1 hora</option>
+                        </select>
+                      </div>
+                      <div class="setting">
+                        <label for="expiry-time">Expiração:</label>
+                        <select id="expiry-time">
+                          <option value="1">1 minuto</option>
+                          <option value="5" selected>5 minutos</option>
+                          <option value="15">15 minutos</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="config-section">
+                    <h4>Gerenciamento</h4>
+                    <div class="management-settings">
+                      <div class="setting">
+                        <label for="money-management">Estratégia:</label>
+                        <select id="money-management">
+                          <option value="flat" selected>Valor Fixo</option>
+                          <option value="martingale">Martingale</option>
+                          <option value="soros">Soros</option>
+                        </select>
+                      </div>
+                      <div class="setting">
+                        <label for="entry-amount">Valor de entrada:</label>
+                        <input
+                          type="number"
+                          id="entry-amount"
+                          value="2"
+                          min="2"
+                          step="1"
+                        />
+                      </div>
+                      <div class="setting">
+                        <label for="stop-gain">Stop Gain (R$):</label>
+                        <input
+                          type="number"
+                          id="stop-gain"
+                          value="50"
+                          min="0"
+                          step="1"
+                        />
+                      </div>
+                      <div class="setting">
+                        <label for="stop-loss">Stop Loss (R$):</label>
+                        <input
+                          type="number"
+                          id="stop-loss"
+                          value="30"
+                          min="0"
+                          step="1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="assets-list" id="assets-list">
-                <p>Carregando ativos...</p>
+
+              <div class="action-buttons">
+                <button id="save-config" class="secondary-btn">
+                  Salvar Configurações
+                </button>
+                <button id="start-bot" class="primary-btn">Iniciar Robô</button>
+                <button id="stop-bot" class="danger-btn hidden">
+                  Parar Robô
+                </button>
+                <button id="test-entry" class="secondary-btn">
+                  Testar Entrada
+                </button>
+              </div>
+            </div>
+
+            <div class="panel dashboard-panel">
+              <h3>Dashboard</h3>
+              <div class="dashboard">
+                <div class="dashboard-item">
+                  <div class="dashboard-label">Saldo Atual</div>
+                  <div class="dashboard-value" id="current-balance">
+                    R$ 0.00
+                  </div>
+                </div>
+                <div class="dashboard-item">
+                  <div class="dashboard-label">Total de Operações</div>
+                  <div class="dashboard-value" id="total-operations">0</div>
+                </div>
+                <div class="dashboard-item">
+                  <div class="dashboard-label">Vitórias</div>
+                  <div class="dashboard-value" id="total-wins">0</div>
+                </div>
+                <div class="dashboard-item">
+                  <div class="dashboard-label">Taxa de Acerto</div>
+                  <div class="dashboard-value" id="win-rate">0%</div>
+                </div>
+                <div class="dashboard-item">
+                  <div class="dashboard-label">Lucro/Prejuízo</div>
+                  <div class="dashboard-value" id="profit-loss">R$ 0.00</div>
+                </div>
+                <div class="dashboard-item">
+                  <div class="dashboard-label">Maior Valor Operado</div>
+                  <div class="dashboard-value" id="max-amount">R$ 0.00</div>
+                </div>
+                <div class="dashboard-item">
+                  <div class="dashboard-label">Menor Valor Operado</div>
+                  <div class="dashboard-value" id="min-amount">R$ 0.00</div>
+                </div>
+                <div class="dashboard-item">
+                  <div class="dashboard-label">Maior Lucro</div>
+                  <div class="dashboard-value" id="max-profit">R$ 0.00</div>
+                </div>
+                <div class="dashboard-item">
+                  <div class="dashboard-label">Maior Perda</div>
+                  <div class="dashboard-value" id="max-loss">R$ 0.00</div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="config-section">
-            <h4>Tempo</h4>
-            <div class="time-settings">
-              <div class="setting">
-                <label for="candle-time">Tempo de vela:</label>
-                <select id="candle-time">
-                  <option value="60" selected>1 minuto</option>
-                  <option value="300">5 minutos</option>
-                  <option value="900">15 minutos</option>
-                  <option value="3600">1 hora</option>
-                </select>
+          <!-- Segunda coluna -->
+          <div class="column">
+            <div class="panel history-panel">
+              <h3>Histórico de Operações</h3>
+              <div class="date-filter">
+                <label for="date-filter">Filtrar por data:</label>
+                <input type="date" id="date-filter" />
+                <button id="clear-filter" class="small-btn">Limpar</button>
               </div>
-              <div class="setting">
-                <label for="expiry-time">Expiração:</label>
-                <select id="expiry-time">
-                  <option value="1">1 minuto</option>
-                  <option value="5" selected>5 minutos</option>
-                  <option value="15">15 minutos</option>
-                </select>
+              <div class="history-container">
+                <table id="history-table">
+                  <thead>
+                    <tr>
+                      <th>Horário</th>
+                      <th>Ativo</th>
+                      <th>Direção</th>
+                      <th>Valor</th>
+                      <th>Resultado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="history-body">
+                    <!-- Operations will be added here -->
+                  </tbody>
+                </table>
               </div>
-            </div>
-          </div>
-
-          <div class="config-section">
-            <h4>Gerenciamento</h4>
-            <div class="management-settings">
-              <div class="setting">
-                <label for="money-management">Estratégia:</label>
-                <select id="money-management">
-                  <option value="flat" selected>Flat (Valor Fixo)</option>
-                  <option value="martingale">Martingale</option>
-                  <option value="soros">Soros</option>
-                </select>
-              </div>
-              <div class="setting">
-                <label for="entry-amount">Valor de entrada:</label>
-                <input
-                  type="number"
-                  id="entry-amount"
-                  value="2"
-                  min="2"
-                  step="1"
-                />
-              </div>
-              <div class="setting">
-                <label for="stop-gain">Stop Gain (R$):</label>
-                <input
-                  type="number"
-                  id="stop-gain"
-                  value="50"
-                  min="0"
-                  step="1"
-                />
-              </div>
-              <div class="setting">
-                <label for="stop-loss">Stop Loss (R$):</label>
-                <input
-                  type="number"
-                  id="stop-loss"
-                  value="30"
-                  min="0"
-                  step="1"
-                />
+              <div class="action-buttons">
+                <button id="clear-history" class="danger-btn">
+                  Limpar Histórico
+                </button>
               </div>
             </div>
-          </div>
 
-          <div class="action-buttons">
-            <button id="save-config" class="secondary-btn">
-              Salvar Configurações
-            </button>
-            <button id="start-bot" class="primary-btn">Iniciar Robô</button>
-            <button id="stop-bot" class="danger-btn hidden">Parar Robô</button>
-            <button id="test-entry" class="secondary-btn">
-              Testar Entrada
-            </button>
-          </div>
-        </div>
-
-        <div class="panel">
-          <h3>Dashboard</h3>
-
-          <div class="dashboard">
-            <div class="dashboard-item">
-              <div class="dashboard-label">Saldo Atual</div>
-              <div class="dashboard-value" id="current-balance">R$ 0.00</div>
+            <div class="panel logs-panel">
+              <h3>Logs</h3>
+              <div class="logs-container" id="logs-container">
+                <!-- Logs will be added here -->
+              </div>
             </div>
-            <div class="dashboard-item">
-              <div class="dashboard-label">Total de Operações</div>
-              <div class="dashboard-value" id="total-operations">0</div>
-            </div>
-            <div class="dashboard-item">
-              <div class="dashboard-label">Vitórias</div>
-              <div class="dashboard-value" id="total-wins">0</div>
-            </div>
-            <div class="dashboard-item">
-              <div class="dashboard-label">Taxa de Acerto</div>
-              <div class="dashboard-value" id="win-rate">0%</div>
-            </div>
-            <div class="dashboard-item">
-              <div class="dashboard-label">Lucro/Prejuízo</div>
-              <div class="dashboard-value" id="profit-loss">R$ 0.00</div>
-            </div>
-            <div class="dashboard-item">
-              <div class="dashboard-label">Maior Valor Operado</div>
-              <div class="dashboard-value" id="max-amount">R$ 0.00</div>
-            </div>
-            <div class="dashboard-item">
-              <div class="dashboard-label">Menor Valor Operado</div>
-              <div class="dashboard-value" id="min-amount">R$ 0.00</div>
-            </div>
-            <div class="dashboard-item">
-              <div class="dashboard-label">Maior Lucro</div>
-              <div class="dashboard-value" id="max-profit">R$ 0.00</div>
-            </div>
-            <div class="dashboard-item">
-              <div class="dashboard-label">Maior Perda</div>
-              <div class="dashboard-value" id="max-loss">R$ 0.00</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <h3>Histórico de Operações</h3>
-          <div class="date-filter">
-            <label for="date-filter">Filtrar por data:</label>
-            <input type="date" id="date-filter" />
-            <button id="clear-filter" class="small-btn">Limpar</button>
-          </div>
-          <div class="history-container">
-            <table id="history-table">
-              <thead>
-                <tr>
-                  <th>Horário</th>
-                  <th>Ativo</th>
-                  <th>Direção</th>
-                  <th>Valor</th>
-                  <th>Resultado</th>
-                </tr>
-              </thead>
-              <tbody id="history-body">
-                <!-- Operations will be added here -->
-              </tbody>
-            </table>
-          </div>
-          <div class="action-buttons">
-            <button id="clear-history" class="danger-btn">
-              Limpar Histórico
-            </button>
-          </div>
-        </div>
-
-        <div class="panel">
-          <h3>Logs</h3>
-          <div class="logs-container" id="logs-container">
-            <!-- Logs will be added here -->
           </div>
         </div>
       </div>

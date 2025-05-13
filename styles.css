@@ -24,12 +24,14 @@ body {
   background-color: var(--light-bg);
   color: var(--text-color);
   line-height: 1.6;
+  min-height: 100vh;
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 15px;
+  height: 100%;
 }
 
 .hidden {
@@ -41,14 +43,14 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   padding-bottom: 15px;
   border-bottom: 1px solid var(--border-color);
 }
 
 header h1 {
   color: var(--primary-color);
-  font-size: 28px;
+  font-size: 24px;
 }
 
 .status-indicator {
@@ -71,13 +73,30 @@ header h1 {
   background-color: var(--success-color);
 }
 
+/* Grid Layout for Main Content */
+.grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  height: calc(100vh - 100px);
+  overflow: hidden;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
 /* Panel Styles */
 .panel {
   background-color: var(--card-bg);
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 25px;
+  padding: 15px;
+  flex: 0 0 auto;
 }
 
 .panel h3 {
@@ -85,6 +104,20 @@ header h1 {
   margin-bottom: 15px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border-color);
+  font-size: 18px;
+}
+
+/* Config Panel */
+.config-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  flex: 1;
 }
 
 /* Login Section */
@@ -153,12 +186,13 @@ header h1 {
 .primary-btn,
 .secondary-btn,
 .danger-btn {
-  padding: 10px 20px;
+  padding: 8px 16px;
   border: none;
   border-radius: 4px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 14px;
 }
 
 .primary-btn {
@@ -190,7 +224,7 @@ header h1 {
 }
 
 .small-btn {
-  padding: 5px 10px;
+  padding: 4px 8px;
   font-size: 12px;
   border: none;
   border-radius: 4px;
@@ -200,16 +234,17 @@ header h1 {
 
 /* Config Sections */
 .config-section {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .config-section h4 {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: var(--secondary-color);
+  font-size: 16px;
 }
 
 .search-container {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .search-container input {
@@ -222,23 +257,27 @@ header h1 {
 .assets-container {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .selected-assets {
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 10px;
+  padding: 8px;
   min-height: 50px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  max-height: 100px;
+  overflow-y: auto;
 }
 
 .selected-assets .asset-chip {
   display: inline-block;
   background-color: var(--primary-color);
   color: white;
-  padding: 5px 10px;
+  padding: 3px 8px;
   border-radius: 15px;
   margin: 3px;
+  font-size: 12px;
 }
 
 .selected-assets .remove-asset {
@@ -247,18 +286,19 @@ header h1 {
 }
 
 .assets-list {
-  max-height: 200px;
+  height: 150px;
   overflow-y: auto;
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 10px;
+  padding: 8px;
 }
 
 .asset-item {
-  padding: 5px;
+  padding: 4px;
   cursor: pointer;
   border-radius: 4px;
   margin-bottom: 2px;
+  font-size: 13px;
 }
 
 .asset-item:hover {
@@ -267,82 +307,100 @@ header h1 {
 
 /* Settings Styles */
 .setting {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   display: flex;
   flex-direction: column;
 }
 
 .setting label {
-  margin-bottom: 5px;
+  margin-bottom: 3px;
+  font-size: 14px;
 }
 
 .setting input,
 .setting select {
-  padding: 8px;
+  padding: 6px 8px;
   border: 1px solid var(--border-color);
   border-radius: 4px;
+  font-size: 14px;
 }
 
 /* Time Settings */
 .time-settings {
-  display: flex;
-  gap: 15px;
-}
-
-.time-settings .setting {
-  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 /* Action Buttons */
 .action-buttons {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 10px;
 }
 
 /* Dashboard Styles */
+.dashboard-panel {
+  flex: 1;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
 .dashboard {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  gap: 10px;
+  flex: 1;
 }
 
 .dashboard-item {
-  padding: 15px;
-  border-radius: 8px;
+  padding: 10px;
+  border-radius: 6px;
   background-color: var(--light-bg);
   text-align: center;
 }
 
 .dashboard-label {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--secondary-color);
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 
 .dashboard-value {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
 }
 
-/* History Table */
+/* History Panel */
+.history-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 350px;
+}
+
 .date-filter {
   display: flex;
   gap: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   align-items: center;
+  font-size: 14px;
 }
 
 .date-filter input {
-  padding: 8px;
+  padding: 6px;
   border: 1px solid var(--border-color);
   border-radius: 4px;
 }
 
 .history-container {
-  max-height: 300px;
+  flex: 1;
   overflow-y: auto;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
+  min-height: 200px;
 }
 
 table {
@@ -352,9 +410,10 @@ table {
 
 th,
 td {
-  padding: 10px;
+  padding: 8px;
   text-align: left;
   border-bottom: 1px solid var(--border-color);
+  font-size: 13px;
 }
 
 th {
@@ -371,25 +430,34 @@ th {
   color: var(--danger-color);
 }
 
-/* Logs Container */
+/* Logs Panel */
+.logs-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 250px;
+}
+
 .logs-container {
-  max-height: 300px;
+  flex: 1;
   overflow-y: auto;
   font-family: monospace;
-  padding: 10px;
+  padding: 8px;
   background-color: var(--light-bg);
   border-radius: 4px;
+  font-size: 12px;
+  min-height: 150px;
 }
 
 .log-entry {
-  margin-bottom: 5px;
-  padding-bottom: 5px;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
   border-bottom: 1px solid var(--border-color);
 }
 
 .log-time {
   font-weight: bold;
-  margin-right: 10px;
+  margin-right: 8px;
 }
 
 .log-info {
@@ -405,9 +473,34 @@ th {
 }
 
 /* Responsive Design */
+@media (min-width: 1600px) {
+  .container {
+    max-width: 1800px;
+  }
+
+  .dashboard {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  .grid-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .column {
+    overflow-y: visible;
+  }
+
+  .config-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .time-settings {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .dashboard {
@@ -420,7 +513,7 @@ th {
 
   .action-buttons button {
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 }
 

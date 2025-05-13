@@ -72,3 +72,12 @@
 2025-05-13 16:20:42,637 - robo-trader.connector - INFO - Executing CALL order on USDHKD-OTC for 2$, expiry: 5min (digital)
 2025-05-13 16:20:42,638 - iqoptionapi.stable_api - INFO - do1382A20250513D192500T5MCSPT
 2025-05-13 16:20:43,288 - robo-trader.connector - INFO - Trade executed with ID: 19956385358
+2025-05-13 16:25:04,482 - robo-trader.connector - INFO - Trade result: LOSS, profit: -2
+2025-05-13 16:25:04,483 - robo-trader - INFO - Trade result: {'time': '2025-05-13T16:25:04.483134', 'asset': 'USDHKD-OTC', 'direction': 'call', 'amount': 2, 'expiration': 5, 'result': {'success': True, 'order_id': 19956385358, 'profit_amount': -2, 'outcome': 'LOSS'}}
+2025-05-13 16:25:52,945 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:25:54,428 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:25:54,839 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7977.72
+2025-05-13 16:26:43,263 - robo-trader - INFO - Executing trade: USDZAR-OTC call 2$ exp:5min
+2025-05-13 16:26:52,624 - robo-trader.connector - INFO - Executing CALL order on USDZAR-OTC for 2$, expiry: 5min (digital)
+2025-05-13 16:26:52,625 - iqoptionapi.stable_api - INFO - do1380A20250513D193000T5MCSPT
+2025-05-13 16:26:53,310 - robo-trader.connector - INFO - Trade executed with ID: 19956397494

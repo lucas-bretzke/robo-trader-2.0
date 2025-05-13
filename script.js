@@ -19,6 +19,20 @@ let availableAssets = {
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize the application
   init()
+
+  // Toggle password visibility
+  const togglePasswordBtn = document.getElementById('toggle-password')
+  const passwordInput = document.getElementById('iq-password')
+
+  togglePasswordBtn.addEventListener('click', function () {
+    if (passwordInput.type === 'text') {
+      passwordInput.type = 'password'
+      togglePasswordBtn.innerHTML = '<i class="eye-closed">👁️‍🗨️</i>'
+    } else {
+      passwordInput.type = 'text'
+      togglePasswordBtn.innerHTML = '<i class="eye-open">👁️</i>'
+    }
+  })
 })
 
 // Initialize the application

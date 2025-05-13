@@ -42,12 +42,17 @@
         </div>
         <div class="setting">
           <label for="iq-password">Senha:</label>
-          <input
-            type="password"
-            id="iq-password"
-            placeholder="Sua senha"
-            required
-          />
+          <div class="password-field">
+            <input
+              type="text"
+              id="iq-password"
+              placeholder="Sua senha"
+              required
+            />
+            <span class="eye-icon" id="toggle-password">
+              <i class="eye-open">👁️</i>
+            </span>
+          </div>
           <small class="form-hint">Senha da sua conta IQ Option</small>
         </div>
         <div id="login-error" class="login-error hidden">

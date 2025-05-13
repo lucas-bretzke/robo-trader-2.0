@@ -123,63 +123,141 @@ header h1 {
 /* Login Section */
 .login-section {
   max-width: 500px;
-  margin: 0 auto;
+  margin: 40px auto;
   text-align: center;
+  background-color: var(--card-bg);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login-section h2 {
+  margin-bottom: 25px;
+  color: var(--primary-color);
+  font-size: 24px;
 }
 
 .login-section .setting {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   text-align: left;
+}
+
+.login-section label {
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: var(--secondary-color);
 }
 
 .login-section input {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid var(--border-color);
   border-radius: 4px;
+  font-size: 16px;
+  transition: border 0.3s ease;
+}
+
+.login-section input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.2);
+}
+
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  color: #777;
+  font-size: 18px;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eye-open,
+.eye-closed {
+  display: block;
 }
 
 .form-hint {
   display: block;
   font-size: 12px;
   color: #666;
-  margin-top: 3px;
+  margin-top: 5px;
 }
 
 .login-error {
   background-color: rgba(244, 67, 54, 0.1);
   color: var(--danger-color);
-  padding: 10px;
+  padding: 12px;
   border-radius: 4px;
-  margin: 10px 0;
+  margin: 15px 0;
   border: 1px solid var(--danger-color);
+  font-size: 14px;
 }
 
 .login-status {
   background-color: var(--light-bg);
-  padding: 10px;
+  padding: 12px;
   border-radius: 4px;
-  margin: 10px 0;
+  margin: 15px 0;
+  font-size: 14px;
 }
 
 .login-section .primary-btn {
-  margin-top: 15px;
+  margin-top: 20px;
   width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .login-help {
-  margin-top: 15px;
-  font-size: 12px;
+  margin-top: 20px;
+  font-size: 14px;
   color: #666;
+  line-height: 1.5;
 }
 
 .login-help a {
   color: var(--primary-color);
   text-decoration: none;
+  font-weight: 500;
 }
 
 .login-help a:hover {
   text-decoration: underline;
+}
+
+/* Account selector */
+.account-selector {
+  display: flex;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.account-btn {
+  flex: 1;
+  padding: 10px;
+  background-color: var(--light-bg);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.account-btn.active {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 500;
 }
 
 /* Button Styles */

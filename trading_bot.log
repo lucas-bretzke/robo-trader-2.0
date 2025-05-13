@@ -81,3 +81,18 @@
 2025-05-13 16:26:52,624 - robo-trader.connector - INFO - Executing CALL order on USDZAR-OTC for 2$, expiry: 5min (digital)
 2025-05-13 16:26:52,625 - iqoptionapi.stable_api - INFO - do1380A20250513D193000T5MCSPT
 2025-05-13 16:26:53,310 - robo-trader.connector - INFO - Trade executed with ID: 19956397494
+2025-05-13 16:31:42,409 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:31:45,014 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:31:45,519 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.5
+2025-05-13 16:34:27,690 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:34:29,518 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:34:29,962 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.5
+2025-05-13 16:36:27,353 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:36:30,601 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:36:31,009 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.5
+2025-05-13 16:37:33,695 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:37:35,286 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:37:35,662 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.5
+2025-05-13 16:38:37,061 - robo-trader - INFO - Starting trading loop
+2025-05-13 16:38:37,064 - robo-trader.strategy - INFO - Stochastic strategy initialized with parameters: K=14, D=3, Slowing=3, Upper=90, Lower=10, SMA=20
+2025-05-13 16:38:37,064 - robo-trader.money_management - INFO - Money manager initialized with strategy: flat, base amount: 2.0, stop gain: 50.0, stop loss: 30.0

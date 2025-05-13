@@ -1,5 +1,6 @@
 import logging
 from iqoptionapi.stable_api import IQ_Option
+from connection_manager import ConnectionManager
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -7,8 +8,45 @@ logging.basicConfig(level=logging.INFO)
 class IQOptionConnector:
     def __init__(self, email, password):
         self.api = IQ_Option(email, password)
+        self.connection_manager = ConnectionManager(self)
         self.api.connect()
         self.api.change_balance("PRACTICE")  # Default to practice account
+
+    def connect(self):
+        """Connect to IQ Option API."""
+        try:
+            logger.info("Connecting to IQ Option...")
+            connected = self.api.connect()
+            
+            if connected:
+                logger.info("Connected successfully!")
+                # Start connection monitoring after successful connection
+                self.connection_manager.start_monitoring()
+                return True
+            else:
+                logger.error("Connection failed!")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error connecting to IQ Option: {e}")
+            return False
+
+    def check_connect(self):
+        """Check if the connection is still active."""
+        try:
+            return self.api.check_connect()
+        except Exception:
+            return False
+
+    def disconnect(self):
+        """Disconnect from IQ Option API."""
+        try:
+            # Stop connection monitoring before disconnecting
+            self.connection_manager.stop_monitoring()
+            self.api.disconnect()
+            logger.info("Disconnected from IQ Option")
+        except Exception as e:
+            logger.error(f"Error disconnecting from IQ Option: {e}")
 
     def is_connected(self):
         return self.api.check_connect()

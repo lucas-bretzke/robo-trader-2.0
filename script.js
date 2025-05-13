@@ -54,7 +54,72 @@ function setupEventListeners() {
   // Bot controls
   document.getElementById('start-bot').addEventListener('click', startBot)
   document.getElementById('stop-bot').addEventListener('click', stopBot)
-  document.getElementById('test-entry').addEventListener('click', testEntry)
+  document.getElementById('test-entry').addEventListener('click', async () => {
+    if (!isConnected) {
+      addLogEntry('Você precisa estar conectado para testar entradas', 'error')
+      return
+    }
+
+    const selectedAssetsElements = document.querySelectorAll(
+      '#selected-assets .asset-chip'
+    )
+    if (selectedAssetsElements.length === 0) {
+      addLogEntry('Selecione pelo menos um ativo para testar', 'error')
+      return
+    }
+
+    const selectedAsset = selectedAssetsElements[0].textContent
+      .trim()
+      .split(' ')[0]
+    const entryAmount = parseFloat(
+      document.getElementById('entry-amount').value
+    )
+    const expiryTime = document.getElementById('expiry-time').value
+
+    if (isNaN(entryAmount) || entryAmount <= 0) {
+      addLogEntry('Valor de entrada inválido', 'error')
+      return
+    }
+
+    addLogEntry(`Executando entrada de teste em ${selectedAsset}...`, 'info')
+
+    try {
+      const response = await fetch(`${API_URL}/test-entry`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          asset: selectedAsset,
+          amount: entryAmount,
+          direction: 'call', // Using CALL as default test
+          expiry: parseInt(expiryTime)
+        })
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(
+          `Servidor retornou erro ${response.status}: ${errorText}`
+        )
+      }
+
+      const result = await response.json()
+
+      if (result.success) {
+        addLogEntry(
+          `Entrada de teste executada: ${selectedAsset} CALL`,
+          'success'
+        )
+      } else {
+        // Handle case where result.error might be undefined
+        const errorMessage = result.error || 'Erro desconhecido na entrada'
+        addLogEntry(`Erro na entrada de teste: ${errorMessage}`, 'error')
+      }
+    } catch (error) {
+      addLogEntry(`Erro ao executar teste: ${error.message}`, 'error')
+    }
+  })
 
   // History
   document
@@ -378,52 +443,37 @@ async function stopBot() {
 }
 
 // Test a trade entry
-async function testEntry() {
+async function executeTrade(asset, direction, amount, expiry) {
   try {
-    addLogEntry('Executando entrada de teste...', 'info')
-
-    const response = await fetch(`${API_URL}/test-entry`, {
+    const response = await fetch(`${API_URL}/execute-trade`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({})
+      body: JSON.stringify({
+        asset: asset,
+        amount: amount,
+        direction: direction,
+        expiry: expiry
+      })
     })
 
-    const data = await response.json()
+    const result = await response.json()
 
-    if (response.ok) {
+    if (result.success) {
       addLogEntry(
-        `Entrada de teste executada: ${
-          data.asset
-        } ${data.direction.toUpperCase()}`,
-        'info'
+        `Operação executada: ${asset} ${direction.toUpperCase()}`,
+        'success'
       )
-
-      // Add to history if there's a result
-      if (data.result && data.result.success) {
-        const profit = data.result.profit_amount
-        const status = profit > 0 ? 'win' : 'loss'
-
-        const operation = {
-          id: operationHistory.length + 1,
-          time: new Date().toISOString(),
-          asset: data.asset,
-          direction: data.direction,
-          amount: 2, // Fixed amount for test entries
-          result: profit,
-          status: status
-        }
-
-        addOperationToHistory(operation)
-      }
+      addOperationToHistory(result)
+      return result
     } else {
-      addLogEntry(`Erro na entrada de teste: ${data.message}`, 'error')
-      alert(`Erro na entrada de teste: ${data.message}`)
+      addLogEntry(`Erro na operação: ${result.error}`, 'error')
+      return null
     }
   } catch (error) {
-    addLogEntry(`Erro na entrada de teste: ${error.message}`, 'error')
-    alert(`Erro na entrada de teste: ${error.message}`)
+    addLogEntry(`Erro ao executar operação: ${error.message}`, 'error')
+    return null
   }
 }
 

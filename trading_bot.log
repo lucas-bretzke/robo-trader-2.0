@@ -29,3 +29,46 @@
 2025-05-13 16:07:36,683 - robo-trader.connector - INFO - Connected successfully!
 2025-05-13 16:07:37,170 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.72
 2025-05-13 16:08:49,124 - robo-trader - INFO - Executing trade: SOLUSD-OTC put 2$ exp:5min
+2025-05-13 16:08:59,270 - robo-trader.connector - INFO - Executing PUT order on SOLUSD-OTC for 2$, expiry: 5min (digital)
+2025-05-13 16:08:59,279 - robo-trader.connector - ERROR - Error executing trade: 'SOLUSD-OTC'
+2025-05-13 16:08:59,280 - robo-trader - INFO - Trade result: {'time': '2025-05-13T16:08:59.279595', 'asset': 'SOLUSD-OTC', 'direction': 'put', 'amount': 2, 'expiration': 5, 'result': {'success': False, 'error': "'SOLUSD-OTC'", 'profit_amount': -2}}
+2025-05-13 16:09:25,588 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:09:27,583 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:09:27,942 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.72
+2025-05-13 16:10:13,504 - robo-trader - INFO - Executing trade: EURTHB-OTC call 2$ exp:5min
+2025-05-13 16:10:22,978 - robo-trader.connector - INFO - Executing CALL order on EURTHB-OTC for 2$, expiry: 5min (digital)
+2025-05-13 16:10:22,980 - robo-trader.connector - ERROR - Error executing trade: 'EURTHB-OTC'
+2025-05-13 16:10:22,980 - robo-trader - INFO - Trade result: {'time': '2025-05-13T16:10:22.980560', 'asset': 'EURTHB-OTC', 'direction': 'call', 'amount': 2, 'expiration': 5, 'result': {'success': False, 'error': "'EURTHB-OTC'", 'profit_amount': -2}}
+2025-05-13 16:11:54,477 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:11:55,987 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:11:56,433 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.72
+2025-05-13 16:14:30,998 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:14:33,550 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:14:33,906 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.72
+2025-05-13 16:15:35,419 - robo-trader - INFO - Executing trade: USNDAQ100:N call 2$ exp:5min
+2025-05-13 16:15:46,088 - robo-trader.connector - INFO - Executing CALL order on USNDAQ100:N for 2$, expiry: 5min (digital)
+2025-05-13 16:15:46,089 - robo-trader.connector - ERROR - Error executing trade: 'USNDAQ100:N'
+2025-05-13 16:15:46,090 - robo-trader - INFO - Trade result: {'time': '2025-05-13T16:15:46.089815', 'asset': 'USNDAQ100:N', 'direction': 'call', 'amount': 2, 'expiration': 5, 'result': {'success': False, 'error': "'USNDAQ100:N'", 'profit_amount': -2}}
+2025-05-13 16:15:46,104 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:15:47,791 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:15:48,219 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.72
+2025-05-13 16:16:39,967 - robo-trader - INFO - Executing trade: PEPEUSD-OTC call 2$ exp:5min
+2025-05-13 16:16:48,296 - robo-trader.connector - INFO - Executing CALL order on PEPEUSD-OTC for 2$, expiry: 5min (digital)
+2025-05-13 16:16:48,297 - robo-trader.connector - ERROR - Error executing trade: 'PEPEUSD-OTC'
+2025-05-13 16:16:48,297 - robo-trader - INFO - Trade result: {'time': '2025-05-13T16:16:48.297283', 'asset': 'PEPEUSD-OTC', 'direction': 'call', 'amount': 2, 'expiration': 5, 'result': {'success': False, 'error': "'PEPEUSD-OTC'", 'profit_amount': -2}}
+2025-05-13 16:17:25,112 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:17:26,650 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:17:27,149 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.72
+2025-05-13 16:17:29,690 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:17:31,240 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:17:31,646 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.72
+2025-05-13 16:19:11,766 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:19:13,117 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:19:13,615 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.72
+2025-05-13 16:19:38,292 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:19:39,850 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:19:40,370 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.72
+2025-05-13 16:20:33,138 - robo-trader - INFO - Executing trade: USDHKD-OTC call 2$ exp:5min
+2025-05-13 16:20:42,637 - robo-trader.connector - INFO - Executing CALL order on USDHKD-OTC for 2$, expiry: 5min (digital)
+2025-05-13 16:20:42,638 - iqoptionapi.stable_api - INFO - do1382A20250513D192500T5MCSPT
+2025-05-13 16:20:43,288 - robo-trader.connector - INFO - Trade executed with ID: 19956385358

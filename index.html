@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IQ Option Robot Trader</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>IQ Option Robot Trader</h1>
+        <div class="status-indicator">
+          <span id="connection-status" class="status-dot offline"></span>
+          <span id="status-text">Desconectado</span>
+        </div>
+      </header>
+
+      <div class="login-section" id="login-section">
+        <h2>Login</h2>
+        <div class="account-selector">
+          <button id="demo-account" class="account-btn active">
+            Conta Demo
+          </button>
+          <button id="real-account" class="account-btn">Conta Real</button>
+        </div>
+        <div class="setting">
+          <label for="iq-email">Email:</label>
+          <input
+            type="email"
+            id="iq-email"
+            placeholder="Seu email IQ Option"
+            required
+          />
+          <small class="form-hint"
+            >Email utilizado no cadastro da IQ Option</small
+          >
+        </div>
+        <div class="setting">
+          <label for="iq-password">Senha:</label>
+          <input
+            type="password"
+            id="iq-password"
+            placeholder="Sua senha"
+            required
+          />
+          <small class="form-hint">Senha da sua conta IQ Option</small>
+        </div>
+        <div id="login-error" class="login-error hidden">
+          <p>Erro de autenticação: Verifique seu email e senha.</p>
+        </div>
+        <div id="login-status" class="login-status hidden">
+          <p>Conectando... Por favor, aguarde.</p>
+        </div>
+        <button id="login-btn" class="primary-btn">Conectar</button>
+        <p class="login-help">
+          Certifique-se de inserir suas credenciais exatas da plataforma IQ
+          Option.
+          <br />
+          <a href="https://iqoption.com/pt/login" target="_blank"
+            >Esqueceu sua senha?</a
+          >
+        </p>
+      </div>
+
+      <div class="main-content hidden" id="main-content">
+        <div class="panel">
+          <h3>Configurações</h3>
+
+          <div class="config-section">
+            <h4>Ativos</h4>
+            <div class="search-container">
+              <input
+                type="text"
+                id="asset-search"
+                placeholder="Buscar ativo..."
+              />
+            </div>
+            <div class="assets-container">
+              <div id="selected-assets" class="selected-assets">
+                <p>Nenhum ativo selecionado</p>
+              </div>
+              <div class="assets-list" id="assets-list">
+                <p>Carregando ativos...</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="config-section">
+            <h4>Tempo</h4>
+            <div class="time-settings">
+              <div class="setting">
+                <label for="candle-time">Tempo de vela:</label>
+                <select id="candle-time">
+                  <option value="60" selected>1 minuto</option>
+                  <option value="300">5 minutos</option>
+                  <option value="900">15 minutos</option>
+                  <option value="3600">1 hora</option>
+                </select>
+              </div>
+              <div class="setting">
+                <label for="expiry-time">Expiração:</label>
+                <select id="expiry-time">
+                  <option value="1">1 minuto</option>
+                  <option value="5" selected>5 minutos</option>
+                  <option value="15">15 minutos</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="config-section">
+            <h4>Gerenciamento</h4>
+            <div class="management-settings">
+              <div class="setting">
+                <label for="money-management">Estratégia:</label>
+                <select id="money-management">
+                  <option value="flat" selected>Flat (Valor Fixo)</option>
+                  <option value="martingale">Martingale</option>
+                  <option value="soros">Soros</option>
+                </select>
+              </div>
+              <div class="setting">
+                <label for="entry-amount">Valor de entrada:</label>
+                <input
+                  type="number"
+                  id="entry-amount"
+                  value="2"
+                  min="2"
+                  step="1"
+                />
+              </div>
+              <div class="setting">
+                <label for="stop-gain">Stop Gain (R$):</label>
+                <input
+                  type="number"
+                  id="stop-gain"
+                  value="50"
+                  min="0"
+                  step="1"
+                />
+              </div>
+              <div class="setting">
+                <label for="stop-loss">Stop Loss (R$):</label>
+                <input
+                  type="number"
+                  id="stop-loss"
+                  value="30"
+                  min="0"
+                  step="1"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button id="save-config" class="secondary-btn">
+              Salvar Configurações
+            </button>
+            <button id="start-bot" class="primary-btn">Iniciar Robô</button>
+            <button id="stop-bot" class="danger-btn hidden">Parar Robô</button>
+            <button id="test-entry" class="secondary-btn">
+              Testar Entrada
+            </button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Dashboard</h3>
+
+          <div class="dashboard">
+            <div class="dashboard-item">
+              <div class="dashboard-label">Saldo Atual</div>
+              <div class="dashboard-value" id="current-balance">R$ 0.00</div>
+            </div>
+            <div class="dashboard-item">
+              <div class="dashboard-label">Total de Operações</div>
+              <div class="dashboard-value" id="total-operations">0</div>
+            </div>
+            <div class="dashboard-item">
+              <div class="dashboard-label">Vitórias</div>
+              <div class="dashboard-value" id="total-wins">0</div>
+            </div>
+            <div class="dashboard-item">
+              <div class="dashboard-label">Taxa de Acerto</div>
+              <div class="dashboard-value" id="win-rate">0%</div>
+            </div>
+            <div class="dashboard-item">
+              <div class="dashboard-label">Lucro/Prejuízo</div>
+              <div class="dashboard-value" id="profit-loss">R$ 0.00</div>
+            </div>
+            <div class="dashboard-item">
+              <div class="dashboard-label">Maior Valor Operado</div>
+              <div class="dashboard-value" id="max-amount">R$ 0.00</div>
+            </div>
+            <div class="dashboard-item">
+              <div class="dashboard-label">Menor Valor Operado</div>
+              <div class="dashboard-value" id="min-amount">R$ 0.00</div>
+            </div>
+            <div class="dashboard-item">
+              <div class="dashboard-label">Maior Lucro</div>
+              <div class="dashboard-value" id="max-profit">R$ 0.00</div>
+            </div>
+            <div class="dashboard-item">
+              <div class="dashboard-label">Maior Perda</div>
+              <div class="dashboard-value" id="max-loss">R$ 0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Histórico de Operações</h3>
+          <div class="date-filter">
+            <label for="date-filter">Filtrar por data:</label>
+            <input type="date" id="date-filter" />
+            <button id="clear-filter" class="small-btn">Limpar</button>
+          </div>
+          <div class="history-container">
+            <table id="history-table">
+              <thead>
+                <tr>
+                  <th>Horário</th>
+                  <th>Ativo</th>
+                  <th>Direção</th>
+                  <th>Valor</th>
+                  <th>Resultado</th>
+                </tr>
+              </thead>
+              <tbody id="history-body">
+                <!-- Operations will be added here -->
+              </tbody>
+            </table>
+          </div>
+          <div class="action-buttons">
+            <button id="clear-history" class="danger-btn">
+              Limpar Histórico
+            </button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Logs</h3>
+          <div class="logs-container" id="logs-container">
+            <!-- Logs will be added here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

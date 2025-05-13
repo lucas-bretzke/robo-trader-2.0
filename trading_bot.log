@@ -211,3 +211,32 @@
 2025-05-13 17:13:08,523 - robo-trader - INFO - Not enough candle data for AMZN/EBAY-OTC, skipping
 2025-05-13 17:13:17,071 - robo-trader.connector - WARNING - No candles returned for ARBUSD-OTC
 2025-05-13 17:13:17,071 - robo-trader - INFO - Not enough candle data for ARBUSD-OTC, skipping
+2025-05-13 17:13:40,799 - robo-trader.connector - WARNING - No candles returned for AUDCHF-OTC
+2025-05-13 17:13:40,799 - robo-trader - INFO - Not enough candle data for AUDCHF-OTC, skipping
+2025-05-13 17:13:48,600 - robo-trader.connector - WARNING - No candles returned for AUDJPY-OTC
+2025-05-13 17:13:48,601 - robo-trader - INFO - Not enough candle data for AUDJPY-OTC, skipping
+2025-05-13 17:13:57,828 - robo-trader.connector - WARNING - No candles returned for AUDNZD-OTC
+2025-05-13 17:13:57,829 - robo-trader - INFO - Not enough candle data for AUDNZD-OTC, skipping
+2025-05-13 17:14:06,791 - robo-trader.connector - WARNING - No candles returned for AUDUSD-OTC
+2025-05-13 17:14:06,791 - robo-trader - INFO - Not enough candle data for AUDUSD-OTC, skipping
+2025-05-13 17:14:15,784 - robo-trader.connector - WARNING - No candles returned for BCHUSD-OTC
+2025-05-13 17:14:15,784 - robo-trader - INFO - Not enough candle data for BCHUSD-OTC, skipping
+2025-05-13 17:14:24,987 - robo-trader.connector - WARNING - No candles returned for BEAMUSD-OTC
+2025-05-13 17:14:24,987 - robo-trader - INFO - Not enough candle data for BEAMUSD-OTC, skipping
+2025-05-13 17:15:05,297 - robo-trader.connector - WARNING - No candles returned for AIG-OTC
+2025-05-13 17:15:05,297 - robo-trader - INFO - Not enough candle data for AIG-OTC, skipping
+2025-05-13 17:15:14,774 - robo-trader.connector - WARNING - No candles returned for ALIBABA-OTC
+2025-05-13 17:15:14,784 - robo-trader - INFO - Not enough candle data for ALIBABA-OTC, skipping
+2025-05-13 17:15:25,181 - robo-trader.connector - WARNING - No candles returned for AMZN/ALIBABA-OTC
+2025-05-13 17:15:25,181 - robo-trader - INFO - Not enough candle data for AMZN/ALIBABA-OTC, skipping
+2025-05-13 17:15:44,763 - robo-trader.connector - WARNING - No candles returned for AMZN/EBAY-OTC
+2025-05-13 17:15:44,763 - robo-trader - INFO - Not enough candle data for AMZN/EBAY-OTC, skipping
+2025-05-13 17:15:54,308 - robo-trader.connector - WARNING - No candles returned for ARBUSD-OTC
+2025-05-13 17:15:54,308 - robo-trader - INFO - Not enough candle data for ARBUSD-OTC, skipping
+2025-05-13 17:16:13,444 - robo-trader.connector - WARNING - No candles returned for AUDCHF-OTC
+2025-05-13 17:16:13,444 - robo-trader - INFO - Not enough candle data for AUDCHF-OTC, skipping
+2025-05-13 17:16:23,274 - robo-trader.connector - WARNING - No candles returned for AUDJPY-OTC
+2025-05-13 17:16:23,275 - robo-trader - INFO - Not enough candle data for AUDJPY-OTC, skipping
+2025-05-13 17:16:45,353 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 17:16:48,254 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 17:16:48,585 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7981.28

@@ -240,3 +240,13 @@
 2025-05-13 17:16:45,353 - robo-trader.connector - INFO - Connecting to IQ Option...
 2025-05-13 17:16:48,254 - robo-trader.connector - INFO - Connected successfully!
 2025-05-13 17:16:48,585 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7981.28
+2025-05-13 17:23:59,489 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 17:24:02,690 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 17:24:03,021 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7981.28
+2025-05-13 17:24:55,529 - robo-trader - INFO - Starting trading loop
+2025-05-13 17:24:55,530 - robo-trader.strategy - INFO - Stochastic strategy initialized with parameters: K=14, D=3, Slowing=3, Upper=90, Lower=10, SMA=20
+2025-05-13 17:24:55,530 - robo-trader.money_management - INFO - Money manager initialized with strategy: flat, base amount: 2.0, stop gain: 50.0, stop loss: 30.0
+2025-05-13 17:25:05,488 - robo-trader.connector - WARNING - No candles returned for AIG-OTC
+2025-05-13 17:25:05,489 - robo-trader - INFO - Not enough candle data for AIG-OTC, skipping
+2025-05-13 17:25:14,252 - robo-trader.connector - WARNING - No candles returned for ALIBABA-OTC
+2025-05-13 17:25:14,252 - robo-trader - INFO - Not enough candle data for ALIBABA-OTC, skipping

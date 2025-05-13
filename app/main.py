@@ -36,3 +36,16 @@ async def shutdown_event():
     logging.info("Shutting down application...")
     # If your connector is in a global variable or accessible here
     # connector.disconnect()
+
+if __name__ == "__main__":
+    import uvicorn
+    
+    uvicorn.run(
+        "main:app", 
+        host="0.0.0.0", 
+        port=8000, 
+        log_level="info",
+        # Aumente o tempo limite da conexão WebSocket
+        ws_ping_interval=20.0,  # Intervalo de ping em segundos
+        ws_ping_timeout=30.0,   # Timeout para resposta de ping
+    )

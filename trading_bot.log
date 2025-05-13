@@ -96,3 +96,118 @@
 2025-05-13 16:38:37,061 - robo-trader - INFO - Starting trading loop
 2025-05-13 16:38:37,064 - robo-trader.strategy - INFO - Stochastic strategy initialized with parameters: K=14, D=3, Slowing=3, Upper=90, Lower=10, SMA=20
 2025-05-13 16:38:37,064 - robo-trader.money_management - INFO - Money manager initialized with strategy: flat, base amount: 2.0, stop gain: 50.0, stop loss: 30.0
+2025-05-13 16:39:33,886 - robo-trader - ERROR - Error in trading loop: 
+2025-05-13 16:42:59,561 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:43:01,908 - robo-trader.connector - ERROR - Connection error: You entered the wrong credentials. Please ensure that your login/password is correct.
+2025-05-13 16:43:01,908 - robo-trader - ERROR - Login failed: You entered the wrong credentials. Please ensure that your login/password is correct.
+2025-05-13 16:43:04,533 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:43:07,045 - robo-trader.connector - ERROR - Connection error: You entered the wrong credentials. Please ensure that your login/password is correct.
+2025-05-13 16:43:07,045 - robo-trader - ERROR - Login failed: You entered the wrong credentials. Please ensure that your login/password is correct.
+2025-05-13 16:43:09,495 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:43:12,053 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:43:12,412 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.5
+2025-05-13 16:45:08,741 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:45:10,405 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:45:10,953 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.5
+2025-05-13 16:45:46,112 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:45:47,808 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:45:48,299 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.5
+2025-05-13 16:46:53,384 - robo-trader - INFO - Starting trading loop
+2025-05-13 16:46:53,385 - robo-trader.strategy - INFO - Stochastic strategy initialized with parameters: K=14, D=3, Slowing=3, Upper=90, Lower=10, SMA=20
+2025-05-13 16:46:53,386 - robo-trader.money_management - INFO - Money manager initialized with strategy: flat, base amount: 2.0, stop gain: 50.0, stop loss: 30.0
+2025-05-13 16:47:02,439 - robo-trader.connector - WARNING - No candles returned for AUDNZD-OTC
+2025-05-13 16:47:02,439 - robo-trader - INFO - Not enough candle data for AUDNZD-OTC, skipping
+2025-05-13 16:47:12,435 - robo-trader.connector - WARNING - No candles returned for AUDUSD-OTC
+2025-05-13 16:47:12,435 - robo-trader - INFO - Not enough candle data for AUDUSD-OTC, skipping
+2025-05-13 16:47:20,485 - robo-trader.connector - WARNING - No candles returned for AUDCHF-OTC
+2025-05-13 16:47:20,485 - robo-trader - INFO - Not enough candle data for AUDCHF-OTC, skipping
+2025-05-13 16:47:28,262 - robo-trader.connector - WARNING - No candles returned for AUDJPY-OTC
+2025-05-13 16:47:28,263 - robo-trader - INFO - Not enough candle data for AUDJPY-OTC, skipping
+2025-05-13 16:47:42,663 - robo-trader.connector - WARNING - No candles returned for BEAMUSD-OTC
+2025-05-13 16:47:42,663 - robo-trader - INFO - Not enough candle data for BEAMUSD-OTC, skipping
+2025-05-13 16:47:51,334 - robo-trader.connector - WARNING - No candles returned for BCHUSD-OTC
+2025-05-13 16:47:51,334 - robo-trader - INFO - Not enough candle data for BCHUSD-OTC, skipping
+2025-05-13 16:48:30,836 - robo-trader.connector - WARNING - No candles returned for AUDNZD-OTC
+2025-05-13 16:48:30,836 - robo-trader - INFO - Not enough candle data for AUDNZD-OTC, skipping
+2025-05-13 16:48:40,298 - robo-trader.connector - WARNING - No candles returned for AUDUSD-OTC
+2025-05-13 16:48:40,298 - robo-trader - INFO - Not enough candle data for AUDUSD-OTC, skipping
+2025-05-13 16:48:49,306 - robo-trader.connector - WARNING - No candles returned for AUDCHF-OTC
+2025-05-13 16:48:49,307 - robo-trader - INFO - Not enough candle data for AUDCHF-OTC, skipping
+2025-05-13 16:48:57,842 - robo-trader.connector - WARNING - No candles returned for AUDJPY-OTC
+2025-05-13 16:48:57,842 - robo-trader - INFO - Not enough candle data for AUDJPY-OTC, skipping
+2025-05-13 16:49:06,562 - robo-trader.connector - WARNING - No candles returned for BEAMUSD-OTC
+2025-05-13 16:49:06,562 - robo-trader - INFO - Not enough candle data for BEAMUSD-OTC, skipping
+2025-05-13 16:49:15,971 - robo-trader.connector - WARNING - No candles returned for BCHUSD-OTC
+2025-05-13 16:49:15,973 - robo-trader - INFO - Not enough candle data for BCHUSD-OTC, skipping
+2025-05-13 16:50:26,972 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:50:29,713 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:50:30,205 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.5
+2025-05-13 16:51:17,971 - robo-trader - INFO - Executing trade: BIDU-OTC call 2$ exp:5min
+2025-05-13 16:51:27,025 - robo-trader.connector - INFO - Executing CALL order on BIDU-OTC for 2$, expiry: 5min (digital)
+2025-05-13 16:51:27,026 - robo-trader.connector - ERROR - Error executing trade: 'BIDU-OTC'
+2025-05-13 16:51:27,026 - robo-trader - INFO - Trade result: {'time': '2025-05-13T16:51:27.026571', 'asset': 'BIDU-OTC', 'direction': 'call', 'amount': 2, 'expiration': 5, 'result': {'success': False, 'error': "'BIDU-OTC'", 'profit_amount': -2}}
+2025-05-13 16:51:48,072 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:51:50,100 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:51:50,571 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.5
+2025-05-13 16:52:38,754 - robo-trader - INFO - Executing trade: CHFNOK-OTC call 2$ exp:5min
+2025-05-13 16:52:48,446 - robo-trader.connector - INFO - Executing CALL order on CHFNOK-OTC for 2$, expiry: 5min (digital)
+2025-05-13 16:52:48,446 - robo-trader.connector - ERROR - Error executing trade: 'CHFNOK-OTC'
+2025-05-13 16:52:48,447 - robo-trader - INFO - Trade result: {'time': '2025-05-13T16:52:48.447726', 'asset': 'CHFNOK-OTC', 'direction': 'call', 'amount': 2, 'expiration': 5, 'result': {'success': False, 'error': "'CHFNOK-OTC'", 'profit_amount': -2}}
+2025-05-13 16:53:10,448 - robo-trader - INFO - Executing trade: XAUUSD-OTC call 2$ exp:5min
+2025-05-13 16:53:20,112 - robo-trader.connector - INFO - Executing CALL order on XAUUSD-OTC for 2$, expiry: 5min (digital)
+2025-05-13 16:53:20,113 - robo-trader.connector - ERROR - Error executing trade: 'XAUUSD-OTC'
+2025-05-13 16:53:20,113 - robo-trader - INFO - Trade result: {'time': '2025-05-13T16:53:20.113028', 'asset': 'XAUUSD-OTC', 'direction': 'call', 'amount': 2, 'expiration': 5, 'result': {'success': False, 'error': "'XAUUSD-OTC'", 'profit_amount': -2}}
+2025-05-13 16:53:33,774 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 16:53:35,797 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 16:53:36,284 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7979.5
+2025-05-13 16:54:41,685 - robo-trader - INFO - Executing trade: USDSGD-OTC call 2$ exp:5min
+2025-05-13 16:54:51,579 - robo-trader.connector - INFO - Executing CALL order on USDSGD-OTC for 2$, expiry: 5min (digital)
+2025-05-13 16:54:51,579 - iqoptionapi.stable_api - INFO - do1381A20250513D200000T5MCSPT
+2025-05-13 16:54:52,208 - robo-trader.connector - INFO - Trade executed with ID: 19956452853
+2025-05-13 17:00:04,385 - robo-trader.connector - INFO - Trade result: WIN, profit: 1.7799999999999998
+2025-05-13 17:00:04,385 - robo-trader - INFO - Trade result: {'time': '2025-05-13T17:00:04.385241', 'asset': 'USDSGD-OTC', 'direction': 'call', 'amount': 2, 'expiration': 5, 'result': {'success': True, 'order_id': 19956452853, 'profit_amount': 1.7799999999999998, 'outcome': 'WIN'}}
+2025-05-13 17:03:31,764 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 17:03:33,422 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 17:03:33,848 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7981.28
+2025-05-13 17:09:12,707 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 17:09:15,339 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 17:09:15,774 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7981.28
+2025-05-13 17:09:35,257 - robo-trader.connector - INFO - Connecting to IQ Option...
+2025-05-13 17:09:36,616 - robo-trader.connector - INFO - Connected successfully!
+2025-05-13 17:09:36,969 - robo-trader.connector - INFO - Selected PRACTICE account. Balance: 7981.28
+2025-05-13 17:10:29,603 - robo-trader - INFO - Starting trading loop
+2025-05-13 17:10:29,603 - robo-trader.strategy - INFO - Stochastic strategy initialized with parameters: K=14, D=3, Slowing=3, Upper=90, Lower=10, SMA=20
+2025-05-13 17:10:29,604 - robo-trader.money_management - INFO - Money manager initialized with strategy: flat, base amount: 2.0, stop gain: 50.0, stop loss: 30.0
+2025-05-13 17:10:39,604 - robo-trader.connector - WARNING - No candles returned for AIG-OTC
+2025-05-13 17:10:39,605 - robo-trader - INFO - Not enough candle data for AIG-OTC, skipping
+2025-05-13 17:10:50,134 - robo-trader.connector - WARNING - No candles returned for ALIBABA-OTC
+2025-05-13 17:10:50,134 - robo-trader - INFO - Not enough candle data for ALIBABA-OTC, skipping
+2025-05-13 17:11:00,512 - robo-trader.connector - WARNING - No candles returned for AMZN/ALIBABA-OTC
+2025-05-13 17:11:00,512 - robo-trader - INFO - Not enough candle data for AMZN/ALIBABA-OTC, skipping
+2025-05-13 17:11:10,824 - robo-trader.connector - WARNING - No candles returned for AMZN/EBAY-OTC
+2025-05-13 17:11:10,825 - robo-trader - INFO - Not enough candle data for AMZN/EBAY-OTC, skipping
+2025-05-13 17:11:19,265 - robo-trader.connector - WARNING - No candles returned for ARBUSD-OTC
+2025-05-13 17:11:19,266 - robo-trader - INFO - Not enough candle data for ARBUSD-OTC, skipping
+2025-05-13 17:11:39,837 - robo-trader.connector - WARNING - No candles returned for AUDCHF-OTC
+2025-05-13 17:11:39,838 - robo-trader - INFO - Not enough candle data for AUDCHF-OTC, skipping
+2025-05-13 17:11:47,996 - robo-trader.connector - WARNING - No candles returned for AUDJPY-OTC
+2025-05-13 17:11:47,996 - robo-trader - INFO - Not enough candle data for AUDJPY-OTC, skipping
+2025-05-13 17:11:57,433 - robo-trader.connector - WARNING - No candles returned for AUDNZD-OTC
+2025-05-13 17:11:57,438 - robo-trader - INFO - Not enough candle data for AUDNZD-OTC, skipping
+2025-05-13 17:12:07,503 - robo-trader.connector - WARNING - No candles returned for AUDUSD-OTC
+2025-05-13 17:12:07,503 - robo-trader - INFO - Not enough candle data for AUDUSD-OTC, skipping
+2025-05-13 17:12:17,093 - robo-trader.connector - WARNING - No candles returned for BCHUSD-OTC
+2025-05-13 17:12:17,094 - robo-trader - INFO - Not enough candle data for BCHUSD-OTC, skipping
+2025-05-13 17:12:25,872 - robo-trader.connector - WARNING - No candles returned for BEAMUSD-OTC
+2025-05-13 17:12:25,873 - robo-trader - INFO - Not enough candle data for BEAMUSD-OTC, skipping
+2025-05-13 17:12:25,874 - robo-trader - ERROR - Error in trading loop: 
+2025-05-13 17:12:41,203 - robo-trader.connector - WARNING - No candles returned for AIG-OTC
+2025-05-13 17:12:41,203 - robo-trader - INFO - Not enough candle data for AIG-OTC, skipping
+2025-05-13 17:12:49,616 - robo-trader.connector - WARNING - No candles returned for ALIBABA-OTC
+2025-05-13 17:12:49,617 - robo-trader - INFO - Not enough candle data for ALIBABA-OTC, skipping
+2025-05-13 17:13:00,152 - robo-trader.connector - WARNING - No candles returned for AMZN/ALIBABA-OTC
+2025-05-13 17:13:00,152 - robo-trader - INFO - Not enough candle data for AMZN/ALIBABA-OTC, skipping
+2025-05-13 17:13:08,523 - robo-trader.connector - WARNING - No candles returned for AMZN/EBAY-OTC
+2025-05-13 17:13:08,523 - robo-trader - INFO - Not enough candle data for AMZN/EBAY-OTC, skipping
+2025-05-13 17:13:17,071 - robo-trader.connector - WARNING - No candles returned for ARBUSD-OTC
+2025-05-13 17:13:17,071 - robo-trader - INFO - Not enough candle data for ARBUSD-OTC, skipping
